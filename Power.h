@@ -20,7 +20,7 @@ enum class PowerSources : int8_t
 class PowerController
 {
     static constexpr int8_t BatteryAdcPin = A6;
-    static constexpr float BatteryPresentVoltage = 3.3f;
+    static constexpr float BatteryPresentVoltage = 3.2f;
     static constexpr int8_t USBAdcPin = A7;
     static constexpr float USBPowerPresentVoltage = 4.3f;
 

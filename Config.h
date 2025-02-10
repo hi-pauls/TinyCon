@@ -91,5 +91,13 @@
 #define LOG_DISPLAY_LN(...)
 #endif
 
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
+#define LOG_I2C_DEVS(...) Serial.print(__VA_ARGS__)
+#define LOG_I2C_DEVS_LN(...) Serial.println(__VA_ARGS__)
+#else
+#define LOG_I2C_DEVS(...)
+#define LOG_I2C_DEVS_LN(...)
+#endif
+
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))

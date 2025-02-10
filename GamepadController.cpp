@@ -16,6 +16,38 @@ void GamepadController::Init()
 
 void GamepadController::Update(uint32_t deltaTime)
 {
+#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
+    LOG_I2C_DEVS("I2C0 Devices: ");
+    bool found = false;
+    for (auto addr = 0x02; addr < 0x70; ++addr)
+    {
+        I2C0.beginTransmission(addr);
+        if (I2C0.endTransmission() == 0)
+        {
+            if (found) LOG_I2C_DEVS(", ");
+            found = true;
+            LOG_I2C_DEVS("0x");
+            LOG_I2C_DEVS(addr, HEX);
+        }
+    }
+
+    LOG_I2C_DEVS_LN();
+    LOG_I2C_DEVS("I2C1 Devices: ");
+    found = false;
+    for (auto addr = 0x08; addr < 0x70; ++addr)
+    {
+        I2C1.beginTransmission(addr);
+        if (I2C1.endTransmission() == 0)
+        {
+            if (found) LOG_I2C_DEVS(", ");
+            found = true;
+            LOG_I2C_DEVS("0x");
+            LOG_I2C_DEVS(addr, HEX);
+        }
+    }
+    LOG_I2C_DEVS_LN();
+#endif
+
     I2C0.setClock(1000000);
     LOG_CONTROLLER_LN("Controller Update:");
     for (int8_t i = 0; i < MaxControllers; ++i)

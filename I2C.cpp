@@ -28,7 +28,7 @@ void I2CController::Send()
         if (addr < RegisterAddress) commandAddress = addr;
         else break;
 
-    uint8_t value = 0;
+    uint8_t value = 0xA5;
     int8_t offset = RegisterAddress - commandAddress;
     switch (Command(commandAddress))
     {

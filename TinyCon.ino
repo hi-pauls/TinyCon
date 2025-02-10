@@ -31,7 +31,9 @@
 
 #if !NO_SLAVE
 #include <nordic/nrfx/mdk/nrf52840.h>
-TwoWire SlaveI2C(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, 11, 12);
+constexpr auto SlaveScl = 12;
+constexpr auto SlaveSda = 11;
+TwoWire SlaveI2C(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, SlaveSda, SlaveScl);
 extern "C" { void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) { SlaveI2C.onService(); } }
 #endif
 

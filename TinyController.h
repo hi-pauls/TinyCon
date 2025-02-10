@@ -20,7 +20,7 @@ class TinyController
     static constexpr auto BluetoothStartButtonTime = 5 * 1000;
 
 public:
-    TinyController(TwoWire& slaveI2C, int8_t address, TwoWire& masterI2C0, SoftWire& masterI2C1)
+    TinyController(TwoWire& slaveI2C, TwoWire& masterI2C0, SoftWire& masterI2C1)
             : Controller(masterI2C0, masterI2C1), Power(masterI2C0), Processor(Controller),
               USBControl(Controller, Processor), Bluetooth(Controller, Processor),
               Indicators(masterI2C0, Controller, Power), I2C(slaveI2C, Controller, Power, Processor) {}

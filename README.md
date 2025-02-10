@@ -43,8 +43,8 @@ not supported in code though and would need to be added to InputController.cpp.
     |                  FUT_AXIS2|A1 o     o EN           | |
     |                  FUT_AXIS3|A2 o  /- o VUSB         | \-- StemmaQt_Slave_3.3V o
     |                  FUT_AXIS4|A3 o  |  o 13|FUT_B5    \---- StemmaQt_Slave_GND  o
-    |   o USER_SW      FUT_AXIS5|A4 o  |  o 12|I2C1_SCL ------ StemmaQt_Slave_SDA  o
-    |   o LED_BLUE     FUT_AXIS6|A5 o  |  o 11|I2C1_SDA ------ StemmaQt_Slave_SCL  o
+    |   o USER_SW      FUT_AXIS5|A4 o  |  o 12|I2C1_SDA ------ StemmaQt_Slave_SDA  o
+    |   o LED_BLUE     FUT_AXIS6|A5 o  |  o 11|I2C1_SCL ------ StemmaQt_Slave_SCL  o
     |   o LED_RED    FUT_B1|SCLK|2  o  |  o 10|FUT_B6
     |   o NEOPIXEL   FUT_B2|MOSI|3  o  |  o  9|FUT_B7
     |   o VBATDIV|A6 FUT_B3|MISO|4  o  |  o  6|FUT_B8

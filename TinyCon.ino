@@ -85,7 +85,7 @@ void setup()
     SlaveI2C.begin(0x44);
 #endif
 
-    Controller.Init();
+    Controller.Init(5);
     Watchdog.enable(1000);
 }
 

@@ -69,8 +69,8 @@ void TinyCon::PinsInputController::Init(const std::array<int8_t, MaxNativeAdcPin
     ButtonCount = CountNotNC(buttonPins);
     Present = AxisCount > 0 || ButtonCount > 0;
     ButtonActiveState = activeState;
-    AxisPins = axisPins;
-    ButtonPins = buttonPins;
+    memcpy(AxisPins.data(), axisPins.data(), AxisPins.size() * sizeof(int8_t));
+    memcpy(ButtonPins.data(), buttonPins.data(), ButtonPins.size() * sizeof(int8_t));
 }
 
 

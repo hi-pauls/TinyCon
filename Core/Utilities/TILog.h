@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Config.h"
-
 #include <Arduino.h>
 #include <cstdint>
 

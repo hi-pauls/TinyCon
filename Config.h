@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Utilities/TILog.h"
+
 #include <Arduino.h>
 
 namespace TinyCon

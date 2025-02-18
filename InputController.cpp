@@ -52,6 +52,27 @@ bool TinyCon::SeesawController::GetUpdatedButton(int8_t index)
 
 void TinyCon::PinsInputController::Update()
 {
+    for (std::size_t axisIndex = 0; axisIndex < AxisPins.size(); ++axisIndex)
+        Axis[axisIndex] = analogRead(AxisPins[axisIndex]) / 512.0f - 1.0f;
+    for (std::size_t buttonIndex = 0; buttonIndex < ButtonPins.size(); ++buttonIndex)
+        Buttons[buttonIndex].AddState(digitalRead(ButtonPins[buttonIndex]) == ((ButtonActiveState == ActiveState::High) ? HIGH : LOW));
+}
+
+bool TinyCon::PinsInputController::GetUpdatedButton(int8_t index)
+{
+    return digitalRead(ButtonPins[index]) == ((ButtonActiveState == ActiveState::High) ? HIGH : LOW);
+}
+
+void TinyCon::PinsInputController::Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState)
+{
+    AxisCount = CountNotNC(axisPins);
+    ButtonCount = CountNotNC(buttonPins);
+    Present = AxisCount > 0 || ButtonCount > 0;
+    ButtonActiveState = activeState;
+    AxisPins = axisPins;
+    ButtonPins = buttonPins;
+}
+{
     if (controller < 4) Seesaw.Init(i2c, controller);
     Present = Seesaw.Present;
 }

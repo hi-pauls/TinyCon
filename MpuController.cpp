@@ -10,7 +10,7 @@ void TinyCon::MpuController::Update()
 {
     if (!Icm20948Present)
     {
-        if (Controller < 2)
+        if (Controller < ICM20948AddressByControllerSize)
         {
             const auto address = ICM20948AddressByController[Controller];
             I2C->beginTransmission(address);

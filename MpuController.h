@@ -64,13 +64,14 @@ public:
         Tiny::Math::TIVector3F Acceleration = {};
         Tiny::Math::TIVector3F AngularVelocity = {};
         Tiny::Math::TIVector3F Orientation = {};
-    uint16_t Temperature = 0;
+        uint16_t Temperature = 0;
 
-private:
+    private:
     static constexpr int8_t ICM20948AddressByController[] = {0x69, 0x68};
-    TwoWire* I2C;
-    int8_t Controller;
-    bool Icm20948Present = false;
+        static constexpr int8_t ICM20948AddressByControllerSize = sizeof(ICM20948AddressByController) / sizeof(ICM20948AddressByController[0]);
+        TwoWire* I2C;
+        int8_t Controller;
+        bool Icm20948Present = false;
     Adafruit_ICM20948 Icm20948;
     AccelerometerRanges AccelerationRange = AccelerometerRanges::G16;
     GyroscopeRanges GyroscopeRange = GyroscopeRanges::D2000;

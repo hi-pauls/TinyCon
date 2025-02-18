@@ -21,206 +21,174 @@ void TinyCon::I2CController::Init()
         };
     SlaveI2C.onRequest(I2CSlaveRequest);
     SlaveI2C.onReceive(I2CSlaveReceive);
+
+    // This ensures, that each register byte we don't write will read back the address of the register, providing a
+    // good way to determine which registers are being read properly and where a read is potentially accessing the
+    // wrong register.
+    for (auto i = 0; i < MaxI2CRegisters; ++i) Registers[i] = i & 0xFF;
+
+    // Set the read-only registers with static data and initialize the others with the defaults
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::ID, Controller.Id);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 0, GamepadController::Version >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 1, GamepadController::Version & 0xFF);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 0, GamepadController::Magic >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 1, GamepadController::Magic & 0xFF);
+
+    // Initialize the configurable registers with the default settings
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::MPUDataEnable,
+                Controller.GetAccelerationEnabled() << 3 | Controller.GetAngularVelocityEnabled() << 2 |
+                Controller.GetOrientationEnabled() << 1 | Controller.GetTemperatureEnabled());
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::FeatureEnable,
+                Processor.GetI2CEnabled() << 2 | Processor.GetBLEEnabled() << 1 | Processor.GetUSBEnabled());
+
+    for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuConfig1, i,
+                    AccelerometerRangeId(Controller.GetAccelerometerRange(i)) << 4 | GyroscopeRangeId(Controller.GetGyroscopeRange(i)));
+
+    // Initialize the dynamic data
+    Update();
 }
 
-void I2CController::Send()
+/**
+ * Write the data to be read from the I2C bus and queue it to the Wire TX buffer to be read by the master. This will
+ * always re-read the last address written to the address register and will consume any data that would otherwise be
+ * used for write commands, so additional reads will not be used as write parameters. Because the Wire library does not
+ * allow us to properly detect stop conditions or read back the remaining bytes in the TX buffer, it is impossible to
+ * determine the actual number of sent bytes. For this reason, we opt to not auto-increment the register base address
+ * with each queued byte, but instead expect the master to update the read base address and read consecutive data until
+ * done or up to the maximum SERIAL_BUFFER_SIZE, then set a new address to continue. Yes, overkill, no choice.
+ *
+ * A read also always invalidates the previous write, so the following commands are not treated as parameter data.
+ */
+void TinyCon::I2CController::Send()
 {
-    int8_t commandAddress = 0;
-    for (auto addr : CommandOrder)
-        if (addr < RegisterAddress) commandAddress = addr;
-        else break;
-
-    uint8_t value = 0xA5;
-    int8_t offset = RegisterAddress - commandAddress;
-    switch (Command(commandAddress))
-    {
-        case Commands::ID:
-            if (offset < 1) value = Controller.Id;
-            break;
-        case Commands::Version:
-            if (offset < 1) value = GamepadController::Version;
-            break;
-        case Commands::Controller1: // 4
-            if (offset == 0) value = ControllerTypeId(Controller.GetControllerType(0));
-            else if (offset == 1) value = (Controller.GetAxisCount(0) << 5) | Controller.GetButtonCount(0);
-            else if (offset == 2) value = MpuTypeId(Controller.GetMpuType(0));
-            else if (offset == 3) value = HapticTypeId(Controller.GetHapticType(0));
-            break;
-        case Commands::Controller2: // 4
-            if (offset == 0) value = ControllerTypeId(Controller.GetControllerType(1));
-            else if (offset == 1) value = (Controller.GetAxisCount(1) << 5) | Controller.GetButtonCount(1);
-            else if (offset == 2) value = MpuTypeId(Controller.GetMpuType(1));
-            else if (offset == 3) value = HapticTypeId(Controller.GetHapticType(1));
-            break;
-        case Commands::LastCommand: // 3
-            if (offset == 0) value = Processor.LastCommand;
-            else if (offset == 1) value = Processor.LastParameter;
-            else if (offset == 2) value = Processor.LastCommandStatus;
-            break;
-        case Commands::BatteryPercentage: // 2
-            if (offset == 0) value = FloatToHalf(Power.Battery.Percentage) >> 8;
-            else if (offset == 1) value = FloatToHalf(Power.Battery.Percentage) & 0xFF;
-            break;
-        case Commands::BatteryVoltage: // 2
     LogI2C::Debug("I2C Read: ", RegisterAddress, Tiny::TIEndl);
-            else if (offset == 1) value = FloatToHalf(Power.Battery.Voltage) & 0xFF;
-            break;
-        case Commands::BatteryTemperature: // 2
-            if (offset == 0) value = FloatToHalf(Power.Battery.Temperature) >> 8;
-            else if (offset == 1) value = FloatToHalf(Power.Battery.Temperature) & 0xFF;
-            break;
-        case Commands::Controller1DeviceEnable:
-            if (offset == 0)
-            {
-                value |= Controller.GetControllerEnabled(0) << 7;
-                value |= Controller.GetAccelerationEnabled(0) << 5;
-                value |= Controller.GetAngularVelocityEnabled(0) << 4;
-                value |= Controller.GetOrientationEnabled(0) << 3;
-                value |= Controller.GetTemperatureEnabled(0) << 2;
-                value |= Controller.GetInputEnabled(0) << 1;
-                value |= Controller.GetHapticEnabled(0);
-            }
-            break;
-        case Commands::Controller2DeviceEnable:
-            if (offset == 0)
-            {
-                value |= Controller.GetControllerEnabled(1) << 7;
-                value |= Controller.GetAccelerationEnabled(1) << 5;
-                value |= Controller.GetAngularVelocityEnabled(1) << 4;
-                value |= Controller.GetOrientationEnabled(1) << 3;
-                value |= Controller.GetTemperatureEnabled(1) << 2;
-                value |= Controller.GetInputEnabled(1) << 1;
-                value |= Controller.GetHapticEnabled(1);
-            }
-            break;
-        case Commands::FeatureEnable:
-            if (offset == 0)
-            {
-                value |= Processor.GetI2CEnabled() << 2;
-                value |= Processor.GetBLEEnabled() << 1;
-                value |= Processor.GetUSBEnabled();
-            }
-            break;
-        case Commands::MpuSettings:
-            if (offset == 0)
-            {
-                value = AccelerometerRangeId(Controller.GetAccelerometerRange()) << 4;
-                value |= GyroscopeRangeId(Controller.GetGyroscopeRange());
-            }
-            break;
-        case Commands::Haptic:
-            if (BufferIndex < 3) SlaveI2C.write(0xFF);
-            else
-            {
-                // Maximum 8 controllers with maximum 32 commands
-                int8_t controller = Buffer[1];
-                int8_t commandIndex = Buffer[2];
-                if (offset == 0) value = HapticController::HapticCommandId(Controller.GetHapticCommand(controller, commandIndex));
-                else if (offset == 1) value = Controller.GetHapticCommandCount(controller, commandIndex);
-                else if (offset > 1 && offset < 10) value = Controller.GetHapticCommandData(controller, commandIndex, offset - 2);
-                else if (offset == 10) value = Controller.GetHapticCommandDuration(controller, commandIndex) >> 8;
-                else if (offset == 11) value = Controller.GetHapticCommandDuration(controller, commandIndex) & 0xFF;
-            }
-            break;
-        case Commands::HapticQueueSize:
-            if (BufferIndex < 2) SlaveI2C.write(0xFF);
-            else if (offset == 0) value = Controller.GetHapticQueueSize(Buffer[1]);
-            break;
-        default:
-            //if (offset < Controller.DataSize)
-            //    value = Controller.Data[offset];
-            break;
-    }
-
-    RegisterAddress++;
-    SlaveI2C.write(value);
+    SlaveI2C.write(Registers.data() + RegisterAddress, TinyCon::MaxI2CWriteBufferFill);
+    BufferIndex = 0;
 }
 
-void I2CController::Receive()
+void TinyCon::I2CController::Receive()
 {
-    // Handle timeout first, if we havent received data for CommandTimeout us, reset
-    auto time = micros() - LastInputTime;
-    if (time > Timeout) BufferIndex = 0;
+    // Handle timeout first, if we haven't received data for CommandTimeout us, reset
+    auto time = micros();
+    if (time - LastInputTime > Timeout) BufferIndex = 0;
+    LastInputTime = time;
 
     if (!SlaveI2C.available()) return;
 
     // At least one byte must be received.
     Buffer[BufferIndex++] = SlaveI2C.read();
     RegisterAddress = Buffer[0];
-    switch (Command(Buffer[0]))
+    switch (Tiny::Drivers::Input::TITinyConCommand(Buffer[0]))
     {
-        case Commands::ID:
-            if (BufferIndex > 1)
+        // Handle writable commands, these can only reset the buffer index if complete
+        // or timed out, only then can we also update the register address
+        case Tiny::Drivers::Input::TITinyConCommands::ID:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig1:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig2:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig3:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig4:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig5:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig6:
+        case Tiny::Drivers::Input::TITinyConCommands::MPUDataEnable:
+        case Tiny::Drivers::Input::TITinyConCommands::FeatureEnable:
+            // These are 1-byte writes, if they succeed, just copy them to the register for reading.
+            if (Processor.ProcessCommand({Buffer.data(), BufferIndex}))
             {
-                Processor.ProcessCommand({Buffer, BufferIndex});
-                BufferIndex = 0;
-            }
-        case Commands::Version:
-        case Commands::Controller1: // 4
-        case Commands::Controller2: // 4
-        case Commands::LastCommand: // 3
-        case Commands::BatteryPercentage: // 2
-        case Commands::BatteryVoltage: // 2
-        case Commands::BatteryTemperature: // 2
-            // Read-only commands, nothing to execute
-            BufferIndex = 0;
-            break;
-        // Register set
-        case Commands::Controller1DeviceEnable:
-            if (BufferIndex > 1)
-            {
-                Processor.ProcessCommand({Buffer, BufferIndex});
+                Registers[RegisterAddress] = Buffer[1];
                 BufferIndex = 0;
             }
 
             break;
-        case Commands::Controller2DeviceEnable:
-            if (BufferIndex > 1)
+        case Tiny::Drivers::Input::TITinyConCommands::HapticRemove:
+        case Tiny::Drivers::Input::TITinyConCommands::HapticReset:
+            // Since the result of these can't be read back immediately but needs to be read through
+            // the haptic command, we don't need to store any change in the register map.
+            if (Processor.ProcessCommand({Buffer.data(), BufferIndex})) BufferIndex = 0;
+            break;
+        case Tiny::Drivers::Input::TITinyConCommands::Haptic:
+            if (Processor.ProcessCommand({Buffer.data(), BufferIndex})) BufferIndex = 0;
+            else if (BufferIndex == 1) memset(Registers.data() + RegisterAddress, 0xFF, 12);
+            else if (BufferIndex > 2 && Buffer[1] < GamepadController::MaxHapticControllers && Buffer[2] < 8)
             {
-                Processor.ProcessCommand({Buffer, BufferIndex});
+                int8_t controller = Buffer[1];
+                int8_t queueIndex = Buffer[2];
+                Registers[RegisterAddress] = HapticController::HapticCommandId(Controller.GetHapticCommand(controller, queueIndex));
+                Registers[RegisterAddress + 1] = Controller.GetHapticCommandCount(controller, queueIndex);
+                for (int8_t i = 0; i < 8; ++i) Registers[RegisterAddress + 2 + i] = Controller.GetHapticCommandData(controller, queueIndex, i);
+                Registers[RegisterAddress + 10] = Controller.GetHapticCommandDuration(controller, queueIndex) >> 8;
+                Registers[RegisterAddress + 11] = Controller.GetHapticCommandDuration(controller, queueIndex) & 0xFF;
+            }
+
+            break;
+        case Tiny::Drivers::Input::TITinyConCommands::HapticQueueSize:
+            // This and the haptic command are the only registers that require additional data
+            // to be read. The haptic command does require 14 byte anyway, so this is fine,
+            // but the queue size command needs this special case.
+            if (BufferIndex == 1) Registers[RegisterAddress] = 0xFF;
+            else if (BufferIndex > 1)
+            {
+                Registers[RegisterAddress] = Controller.GetHapticQueueSize(Buffer[1]);
                 BufferIndex = 0;
             }
-            break;
-        case Commands::FeatureEnable:
-            if (BufferIndex > 1)
-            {
-                Processor.ProcessCommand({Buffer, BufferIndex});
-                BufferIndex = 0;
-            }
-            break;
-        case Commands::MpuSettings:
-            if (BufferIndex > 1)
-            {
-                Processor.ProcessCommand({Buffer, BufferIndex});
-                BufferIndex = 0;
-            }
-            break;
-        case Commands::Haptic:
-            if (BufferIndex > 14)
-            {
-                Processor.ProcessCommand({Buffer, 14});
-                BufferIndex = 0;
-            }
-            break;
-        case Commands::HapticQueueSize:
-            if (BufferIndex > 1)
-                BufferIndex = 0;
-            break;
-        case Commands::HapticRemove:
-            if (BufferIndex > 2)
-            {
-                Processor.ProcessCommand({Buffer, BufferIndex});
-                BufferIndex = 0;
-            }
-            break;
-        case Commands::HapticReset:
-            Processor.ProcessCommand({Buffer, BufferIndex});
-            BufferIndex = 0;
+
             break;
         default:
-            if (0x30 <= Buffer[0] && Buffer[0] < 0x30 + 82)
-                BufferIndex = 0;
+            // Any non-writable command is assumed to reset the buffer immediately
+            BufferIndex = 0;
             break;
     }
+
+    // This needs to update every time we receive a byte, users could be reading back the status at any time
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 0, Processor.LastCommand);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 1, Processor.LastParameter[0]);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 2, Processor.LastParameter[1]);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 3, Tiny::Drivers::Input::TITinyConCommandStatusId(Processor.LastCommandStatus));
 }
 
+void TinyCon::I2CController::Update()
+{
+    uint16_t batteryPercentage = Tiny::Math::HalfFromFloat(Power.Battery.Percentage);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryPercentage, 0, batteryPercentage >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryPercentage, 1, batteryPercentage & 0xFF);
+    uint16_t batteryVoltage = Tiny::Math::HalfFromFloat(Power.Battery.Voltage);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryVoltage, 0, batteryVoltage >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryVoltage, 1, batteryVoltage & 0xFF);
+    uint16_t batteryTemperature = Tiny::Math::HalfFromFloat(Power.Battery.Temperature);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryTemperature, 0, batteryTemperature >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryTemperature, 1, batteryTemperature & 0xFF);
+
+    // Because devices may be detected any time, we need to update the types registers every time with the data
+    for (int8_t i = 0; i < GamepadController::MaxHapticControllers; ++i)
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::HapticTypes, i, HapticTypeId(Controller.GetHapticType(i)));
+    for (int8_t i = 0; i < GamepadController::MaxInputControllers; ++i)
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::ControllerTypes, i,
+                    ControllerTypeId(Controller.GetControllerType(i)));
+
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::AxisCount, Controller.GetAxisCount());
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::ButtonCount, Controller.GetButtonCount());
+    auto dataOffset = Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::Data);
+    for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
+    {
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuTypes, i, MpuTypeId(Controller.GetMpuType(i)));
+        if (Controller.GetMpuPresent(i)) dataOffset += Controller.MakeMpuBuffer({Registers.data() + dataOffset, 20});
+    }
+
+    uint8_t value = 0;
+    for (int8_t i = 0; i < Controller.GetButtonCount(); ++i)
+    {
+        value |= Controller.GetButton(i) << (i & 7);
+        if ((i & 7) == 7)
+        {
+            SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, value);
+            value = 0;
+        }
+    }
+
+    for (auto i = 0; i < Controller.GetAxisCount(); ++i)
+    {
+        auto axis = Tiny::Math::HalfFromFloat(Controller.GetAxis(i));
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis >> 8);
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis & 0xFF);
+    }
+}

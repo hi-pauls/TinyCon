@@ -87,7 +87,7 @@ namespace TinyCon
     #endif
 
     #if USE_OLED
-    static constexpr auto ControllerHeight = 32 / GamepadController::MaxControllers;
+        static constexpr auto DisplayHeight = 32;
         static constexpr auto AxisRoot = 16;
         static constexpr auto MpuWidth = 36;
         static constexpr auto MpuStart = 120 - 2 - MpuWidth;

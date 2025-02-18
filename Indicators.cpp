@@ -42,44 +42,38 @@ void TinyCon::IndicatorController::UpdateDisplay(char mode)
 
         SSD1306.clearDisplay();
 
-        auto axisCount = 0;
-        int8_t buttonCount = 0;
-        for (auto i = 0; i < GamepadController::MaxControllers; ++i)
-        {
-            axisCount = Max(axisCount, Controller.GetAxisCount(i));
-            buttonCount = Max(buttonCount, Controller.GetButtonCount(i));
-        }
-
-        auto axisHeight = (ControllerHeight + axisCount - 1) / axisCount;
-        auto buttonWidth = ControllerHeight + 1;
-        auto buttonHeight = ControllerHeight;
+        auto axisCount = Controller.GetAxisCount();
+        auto axisHeight = DisplayHeight / axisCount;
+        auto buttonWidth = DisplayHeight;
+        auto buttonHeight = DisplayHeight;
+        auto buttonCount = Controller.GetButtonCount();
         auto requiredButtonsPerLine = buttonCount;
         while (buttonWidth * requiredButtonsPerLine > ButtonEnd - ButtonStart)
         {
             if (buttonWidth >= buttonHeight) buttonWidth--;
             else { buttonHeight--; buttonWidth++; }
-            auto lines = ControllerHeight / buttonHeight;
+            auto lines = 32 / buttonHeight;
             requiredButtonsPerLine = (buttonCount + lines - 1) / lines;
         }
 
-        for (int8_t c = 0, controllerY = 0; c < GamepadController::MaxControllers; ++c, controllerY += ControllerHeight) {
-            for (int8_t i = 0, axisY = controllerY; i < axisCount; ++i, ++axisY)
-                if (i < Controller.GetAxisCount(c)) {
-                    auto axis = Controller.GetAxis(c, i);
-                    auto w = Max(abs(AxisRoot * axis), 1);
-                    auto x = axis < 0 ? AxisRoot - w : AxisRoot;
-                    for (auto y = 0; y < axisHeight - 1; ++y, ++axisY)
-                        SSD1306.drawFastHLine(x, axisY, w, 1);
-                }
+        for (int8_t i = 0, axisY = 0; i < axisCount; ++i, ++axisY)
+        {
+            auto axis = Controller.GetAxis(i);
+            auto w = Tiny::Math::Max(abs(AxisRoot * axis), 1);
+            auto x = axis < 0 ? AxisRoot - w : AxisRoot;
+            for (auto y = 0; y < axisHeight - 1; ++y, ++axisY)
+                SSD1306.drawFastHLine(x, axisY, w, 1);
+        }
 
-            auto buttonY = controllerY + (ControllerHeight - buttonHeight) / 2;
-            for (int8_t i = 0, buttonX = ButtonStart; i < buttonCount; ++i, buttonX += buttonWidth) {
-                if (buttonX + buttonWidth > ButtonEnd) {
-                    buttonX = ButtonStart;
-                    buttonY += buttonHeight;
-                }
+        for (int8_t i = 0, buttonX = ButtonStart, buttonY = 0; i < buttonCount; ++i, buttonX += buttonWidth)
+        {
+            if (buttonX + buttonWidth > ButtonEnd)
+            {
+                buttonX = ButtonStart;
+                buttonY += buttonHeight;
+            }
 
-                if (i < Controller.GetButtonCount(c) && Controller.GetButton(c, i))
+            if (Controller.GetButton(i))
                     for (auto y = 0; y < buttonHeight - 1; ++y)
                         SSD1306.drawFastHLine(buttonX, buttonY + y, buttonWidth - 1, 1);
             }

@@ -5,50 +5,117 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
     LastCommand = command[0];
     LastParameter[0] = command[1];
     LastParameter[1] = command[2];
+    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidCommand;
 
     switch (Tiny::Drivers::Input::TITinyConCommand(command[0]))
     {
-        case Commands::ID:
-            Controller.Id = command.Data[1];
+        case Tiny::Drivers::Input::TITinyConCommands::ID:
+            if (command.size() >= 2)
+            {
+                Controller.Id = command[1];
+                LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                return true;
+            }
+
             break;
-        case Commands::Controller1DeviceEnable:
-            Controller.SetControllerEnabled(0, (command.Data[1] & 0x80) != 0);
-            Controller.SetAccelerationEnabled(0, (command.Data[1] & 0x20) != 0);
-            Controller.SetAngularVelocityEnabled(0, (command.Data[1] & 0x10) != 0);
-            Controller.SetOrientationEnabled(0, (command.Data[1] & 0x08) != 0);
-            Controller.SetTemperatureEnabled(0, (command.Data[1] & 0x04) != 0);
-            Controller.SetInputEnabled(0, (command.Data[1] & 0x02) != 0);
-            Controller.SetHapticEnabled(0, (command.Data[1] & 0x01) != 0);
+        case Tiny::Drivers::Input::TITinyConCommands::Haptic:
+            if (command.size() >= 13)
+            {
+                if (command[2] > 8)
+                {
+                    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticDataSize;
+                    return false;
+                }
+
+                LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                for (auto bit = GamepadController::MaxHapticControllers; bit < 8; ++bit)
+                    if ((command[1] & (1 << bit)) != 0)
+                    {
+                        // We'll still execute the command, but we'll return an error
+                        LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::WarningUnknownHapticController;
+                    }
+
+                Controller.AddHapticCommand(command);
+                return true;
+            }
+
             break;
-        case Commands::Controller2DeviceEnable:
-            Controller.SetControllerEnabled(1, (command.Data[1] & 0x80) != 0);
-            Controller.SetAccelerationEnabled(1, (command.Data[1] & 0x20) != 0);
-            Controller.SetAngularVelocityEnabled(1, (command.Data[1] & 0x10) != 0);
-            Controller.SetOrientationEnabled(1, (command.Data[1] & 0x08) != 0);
-            Controller.SetTemperatureEnabled(1, (command.Data[1] & 0x04) != 0);
-            Controller.SetInputEnabled(1, (command.Data[1] & 0x02) != 0);
-            Controller.SetHapticEnabled(1, (command.Data[1] & 0x01) != 0);
-        break;
-        case Commands::FeatureEnable:
-            SetI2CEnabled((command.Data[1] & 0x4) != 0);
-            SetBLEEnabled((command.Data[1] & 0x2) != 0);
-            SetUSBEnabled((command.Data[1] & 0x1) != 0);
+        case Tiny::Drivers::Input::TITinyConCommands::HapticRemove:
+            if (command.size() >= 3)
+            {
+                if (command[1] >= GamepadController::MaxHapticControllers)
+                {
+                    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticController;
+                    return false;
+                }
+
+                if (command[2] >= 8)
+                {
+                    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticDataIndex;
+                    return false;
+                }
+
+                Controller.RemoveHapticCommand(command[1], command[2]);
+                LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                return true;
+            }
+
             break;
-        case Commands::MpuSettings:
-            Controller.SetAccelerometerRange(AccelerometerRange(command.Data[1] >> 4));
-            Controller.SetGyroscopeRange(GyroscopeRange(command.Data[1] & 0xF));
-            break;
-        case Commands::Haptic:
-            Controller.AddHapticCommand(command);
-            break;
-        case Commands::HapticRemove:
-            Controller.RemoveHapticCommand(command.Data[1], command.Data[2]);
-            break;
-        case Commands::HapticReset:
+        case Tiny::Drivers::Input::TITinyConCommands::HapticReset:
             Controller.ClearHapticCommands();
+            LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+            return true;
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig1:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig2:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig3:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig4:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig5:
+        case Tiny::Drivers::Input::TITinyConCommands::MpuConfig6:
+            if (command.size() >= 2)
+            {
+                int8_t offset = command[0] - Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::MpuConfig1);
+                if (offset >= 0 && offset < GamepadController::MaxMpuControllers)
+                {
+                    Controller.SetAccelerometerRange(offset, AccelerometerRange(command[1] >> 4));
+                    Controller.SetGyroscopeRange(offset, GyroscopeRange(command[1] & 0xF));
+                    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                    return true;
+                }
+                else
+                {
+                    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidMpuIndex;
+                    return false;
+                }
+            }
+
+            break;
+        case Tiny::Drivers::Input::TITinyConCommands::MPUDataEnable:
+            if (command.size() >= 2)
+            {
+                Controller.SetAccelerationEnabled((command[1] & 0x08) != 0);
+                Controller.SetAngularVelocityEnabled((command[1] & 0x04) != 0);
+                Controller.SetOrientationEnabled((command[1] & 0x02) != 0);
+                Controller.SetTemperatureEnabled((command[1] & 0x01) != 0);
+                LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                return true;
+            }
+
+            break;
+        case Tiny::Drivers::Input::TITinyConCommands::FeatureEnable:
+            if (command.size() >= 2)
+            {
+                SetI2CEnabled((command[1] & 0x04) != 0);
+                SetBLEEnabled((command[1] & 0x02) != 0);
+                SetUSBEnabled((command[1] & 0x01) != 0);
+                LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
+                return true;
+            }
+
             break;
         default:
             break;
     }
 
+    LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorIncompleteCommand;
+    return false;
 }

@@ -122,6 +122,37 @@ void TinyCon::TinyController::UpdateIndicators(int32_t deltaTime)
         else if (USBControl.IsConnected()) Indicators.SetRed(IndicatorController::LedEffects::On);
         else Indicators.SetRed(IndicatorController::LedEffects::Fade);
 
+#if USE_NEOPIXEL
+        if (Power.PowerSource == PowerSources::USB)
+        {
+            if (Power.Battery.Voltage < 4.1f)
+            {
+                Indicators.SetRgbRed(IndicatorController::LedEffects::Pulse);
+                Indicators.SetRgbGreen(IndicatorController::LedEffects::Off);
+            }
+            else
+            {
+                Indicators.SetRgbRed(IndicatorController::LedEffects::Off);
+                Indicators.SetRgbGreen(IndicatorController::LedEffects::On);
+            }
+
+            Indicators.SetRgbBlue(IndicatorController::LedEffects::Off);
+        }
+        else if (Power.PowerSource == PowerSources::Battery)
+        {
+            if (Power.Battery.Percentage < 0.2f) Indicators.SetRgbRed(IndicatorController::LedEffects::Pulse);
+            else Indicators.SetRgbRed(IndicatorController::LedEffects::Off);
+            Indicators.SetRgbGreen(IndicatorController::LedEffects::Off);
+            Indicators.SetRgbBlue(IndicatorController::LedEffects::Fixed, 127 * Power.Battery.Percentage);
+        }
+        else
+        {
+            Indicators.SetRgbRed(IndicatorController::LedEffects::Off);
+            Indicators.SetRgbGreen(IndicatorController::LedEffects::Off);
+            Indicators.SetRgbBlue(IndicatorController::LedEffects::Off);
+        }
+#endif
+
         char mode = 'D';
         if (Power.PowerSource == PowerSources::I2C) mode = 'I';
         else if (Bluetooth.IsConnected()) mode = 'B';

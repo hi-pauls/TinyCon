@@ -1,10 +1,10 @@
 #include "Indicators.h"
 
-void IndicatorController::Init()
+using LogIndicators = Tiny::TILogTarget<TinyCon::IndicatorLogLevel>;
 {
     pinMode(BlueLedPin, OUTPUT);
     pinMode(RedLedPin, OUTPUT);
-    LOG_DISPLAY_LN("Indicators initialized");
+    LogIndicators::Debug("Indicators initialized", Tiny::TIEndl);
 }
 
 void IndicatorController::Update(uint32_t deltaTime, char mode)
@@ -26,10 +26,10 @@ void IndicatorController::UpdateDisplay(char mode)
 {
     if (!DisplayPresent)
     {
-        LOG_DISPLAY_LN("Init");
+        LogIndicators::Debug("Init", Tiny::TIEndl);
         DisplayPresent = SSD1306.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-        if (DisplayPresent) LOG_DISPLAY(" Success");
-        else LOG_DISPLAY(" Failed");
+        if (DisplayPresent) LogIndicators::Debug(" Success");
+        else LogIndicators::Debug(" Failed");
     }
 
     if (DisplayPresent)

@@ -2,6 +2,8 @@
 #include <cstring>
 #include <memory>
 
+using LogHaptic = Tiny::TILogTarget<TinyCon::HapticLogLevel>;
+
 namespace
 {
     template <typename TWire>
@@ -76,9 +78,9 @@ void DRV2605Controller::Init()
 
 void DRV2605Controller::PlayRealtime(uint8_t value)
 {
-    if (!Present) LOG_CONTROLLER(", No DRV2605");
+    if (!Present) LogHaptic::Info(", No DRV2605");
 
-    LOG_CONTROLLER(", Realtime: "); LOG_CONTROLLER(value);
+    LogHaptic::Info(", Realtime: ", value);
     if (Mode != DRV2605_MODE_REALTIME)
     {
         Mode = DRV2605_MODE_REALTIME;
@@ -92,10 +94,10 @@ void DRV2605Controller::PlayRealtime(uint8_t value)
 
 void DRV2605Controller::PlayWaveform(const uint8_t* data)
 {
-    if (!Present) LOG_CONTROLLER(", No DRV2605");
+    if (!Present) LogHaptic::Info(", No DRV2605");
 
-    LOG_CONTROLLER(", Waveforms: ");
-    for (int8_t i = 0; i < 8; ++i) if (auto d = data[i]) { if (i) LOG_CONTROLLER(", "); LOG_CONTROLLER(d); d++; }
+    LogHaptic::Info(", Waveforms: ");
+    for (int8_t i = 0; i < 8; ++i) if (auto d = data[i]) { if (i) LogHaptic::Info(", ", d); d++; }
 
     if (Mode != DRV2605_MODE_INTTRIG)
     {
@@ -166,15 +168,15 @@ void HapticController::Update(int32_t deltaTime)
 {
     if (!Present && Enabled)
     {
-        LOG_CONTROLLER(", Trying Init");
+        LogHaptic::Info(", Trying Init");
         DRV2605.Init(Wire);
-        if ((Present = DRV2605.Present)) LOG_CONTROLLER(", Success");
-        else LOG_CONTROLLER(", Failed");
+        if ((Present = DRV2605.Present)) LogHaptic::Info(", Success");
+        else LogHaptic::Info(", Failed");
     }
 
     if (HasNewCommand(deltaTime))
     {
-        LOG_CONTROLLER(", Play");
+        LogHaptic::Info(", Play");
         const auto& command = Commands[Tail];
         switch (command.Command)
         {
@@ -193,10 +195,10 @@ void HapticController::Update(int32_t deltaTime)
 
 bool HapticController::HasNewCommand(int32_t deltaTime)
 {
-    if (Tail == Head) { LOG_CONTROLLER(", Finished"); return false; }
+    if (Tail == Head) { LogHaptic::Info(", Finished"); return false; }
 
     auto& command = Commands[Tail];
-    LOG_CONTROLLER(", Command: "); LOG_CONTROLLER(HapticCommandId(command.Command)); LOG_CONTROLLER(", Duration: "); LOG_CONTROLLER(command.Duration);
+    LogHaptic::Info(", Command: ", HapticCommandId(command.Command), ", Duration: ", command.Duration);
     if (command.Command == HapticCommands::PlayRealtime)
     {
         if (RealtimeTimeLeft < deltaTime)
@@ -204,7 +206,7 @@ bool HapticController::HasNewCommand(int32_t deltaTime)
             if (++RealtimeIndex < command.Count)
             {
                 RealtimeTimeLeft = RealtimePerCommandDuration - (deltaTime - RealtimeTimeLeft);
-                LOG_CONTROLLER(", Next");
+                LogHaptic::Info(", Next");
                 return true;
             }
             // Assume we also at this point have command.Duration being <= than deltaTime,
@@ -219,13 +221,13 @@ bool HapticController::HasNewCommand(int32_t deltaTime)
     if (command.Duration > deltaTime)
     {
         command.Duration -= deltaTime;
-        LOG_CONTROLLER(", Left: "); LOG_CONTROLLER(command.Duration);
+        LogHaptic::Info(", Left: ", command.Duration);
         return false;
     }
 
     do
     {
-        LOG_CONTROLLER(", Next");
+        LogHaptic::Info(", Next");
         deltaTime -= command.Duration;
         Tail = (Tail + 1) & 7;
         command = Commands[Tail];

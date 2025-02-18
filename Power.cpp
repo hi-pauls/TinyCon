@@ -1,6 +1,6 @@
 #include "Power.h"
 
-void PowerController::Init()
+using LogPower = Tiny::TILogTarget<TinyCon::PowerLogLevel>;
 {
 #if defined(ADAFRUIT_FEATHER_ESP32S2)
     pinMode(PIN_I2C_POWER, INPUT);
@@ -53,7 +53,6 @@ void PowerController::Update()
         USBPowerVoltage = analogRead(USBAdcPin) * (3.0f / 1024) * 2;
         if (USBPowerVoltage > USBPowerPresentVoltage) PowerSource = PowerSources::USB;
     }
-    LOG_POWER("Power: "); LOG_POWER(PowerSource == PowerSources::USB ? "USB" : PowerSource == PowerSources::Battery ? "Battery" : "I2C");
-    LOG_POWER(", USB: "); LOG_POWER(USBPowerVoltage, 2); LOG_POWER("V, Battery: "); LOG_POWER(Battery.Voltage, 2); LOG_POWER("V, ");
-    LOG_POWER(Battery.Percentage * 100, 0); LOG_POWER_LN("%");
+    LogPower::Info("Power: ", PowerSource == PowerSources::USB ? "USB" : PowerSource == PowerSources::Battery ? "Battery" : "I2C",
+                    ", USB: ", USBPowerVoltage, 2, "V, Battery: ", Battery.Voltage, 2, "V, ", Battery.Percentage * 100, 0, "%", Tiny::TIEndl);
 }

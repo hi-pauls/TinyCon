@@ -1,4 +1,5 @@
 #include "USB.h"
+using LogUsb = Tiny::TILogTarget<TinyCon::UsbLogLevel>;
 
 #if !NO_USB
 void USBController::UsbHidReportReceived(uint8_t reportId, hid_report_type_t report, const uint8_t* data, uint16_t length)
@@ -13,7 +14,7 @@ std::function<uint16_t(uint8_t, hid_report_type_t, uint8_t*, uint16_t)> USBContr
 
 void USBController::Init()
 {
-    LOG_USB_LN("USB Init");
+    LogUsb::Info("USB Init", Tiny::TIEndl);
     Gamepad.setPollInterval(10);
     Gamepad.setStringDescriptor("Game Controller");
     Gamepad.setReportDescriptor(HidDescriptor, sizeof(HidDescriptor));
@@ -29,27 +30,27 @@ void USBController::Init()
 
 void USBController::Update()
 {
-    LOG_USB("USB: ");
+    LogUsb::Debug("USB: ");
     if (!Processor.GetUSBEnabled() || !Active)
     {
-        if (!Processor.GetUSBEnabled()) LOG_USB("Disabled");
-        else LOG_USB("Inactive");
+        if (!Processor.GetUSBEnabled()) LogUsb::Debug("Disabled");
+        else LogUsb::Debug("Inactive");
 
         Active = false;
         Connected = false;
     }
     else if ((Connected = TinyUSBDevice.mounted() && Gamepad.ready()))
     {
-        LOG_USB("Controller");
+        LogUsb::Debug("Controller");
         auto report = Controller.MakeHidReport();
         Gamepad.sendReport(ReportGamepad, &report, sizeof(report));
 
-        LOG_USB(", MPU");
+        LogUsb::Debug(", MPU");
         uint8_t data[MpuReportSize];
         auto size = Controller.MakeMpuBuffer({data, 42});
         Gamepad.sendReport(ReportMpu, data, size);
     }
 
-    LOG_USB_LN();
+    LogUsb::Info(Tiny::TIEndl);
 }
 #endif

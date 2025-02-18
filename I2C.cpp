@@ -2,7 +2,7 @@
 
 #include "HapticController.h"
 
-std::function<void(int)> I2CController::I2CReceiveCallback = [](int) {};
+using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
 std::function<void()> I2CController::I2CRequestCallback = []() {};
 void I2CController::I2CSlaveReceive(int count) { I2CReceiveCallback(count); }
 void I2CController::I2CSlaveRequest() { I2CRequestCallback(); }
@@ -60,7 +60,7 @@ void I2CController::Send()
             else if (offset == 1) value = FloatToHalf(Power.Battery.Percentage) & 0xFF;
             break;
         case Commands::BatteryVoltage: // 2
-            if (offset == 0) value = FloatToHalf(Power.Battery.Voltage) >> 8;
+    LogI2C::Debug("I2C Read: ", RegisterAddress, Tiny::TIEndl);
             else if (offset == 1) value = FloatToHalf(Power.Battery.Voltage) & 0xFF;
             break;
         case Commands::BatteryTemperature: // 2

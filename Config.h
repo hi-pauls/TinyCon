@@ -3,6 +3,15 @@
 #include <Arduino.h>
 
 #define TINYCON_VERSION "0.1"
+    constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel I2CLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel HapticLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel IndicatorLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel UsbLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel PowerLogLevel = Tiny::TILogLevel::Info;
+
 #ifndef TINYCON_PRODUCT
 #define TINYCON_PRODUCT "TinyCon"
 #endif
@@ -28,76 +37,6 @@
 #define NO_USB 0
 #define NO_BLE 0
 #define NO_SLAVE 0
-
-#define LOG_LEVEL_STATE 1
-#define LOG_LEVEL_CONNECTIONS 2
-#define LOG_LEVEL_DETAILS 3
-#define LOG_LEVEL_VERBOSE 4
-#define LOG_LEVEL LOG_LEVEL_CONNECTIONS
-
-#if LOG_LEVEL >= LOG_LEVEL_STATE
-#define LOG_STATE(...) Serial.print(__VA_ARGS__)
-#define LOG_STATE_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_STATE(...)
-#define LOG_STATE_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_CONNECTIONS
-#define LOG_BLUETOOTH(...) Serial.print(__VA_ARGS__)
-#define LOG_BLUETOOTH_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_BLUETOOTH(...)
-#define LOG_BLUETOOTH_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_CONNECTIONS
-#define LOG_USB(...) Serial.print(__VA_ARGS__)
-#define LOG_USB_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_USB(...)
-#define LOG_USB_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_CONNECTIONS
-#define LOG_I2C(...) Serial.print(__VA_ARGS__)
-#define LOG_I2C_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_I2C(...)
-#define LOG_I2C_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_CONNECTIONS
-#define LOG_POWER(...) Serial.print(__VA_ARGS__)
-#define LOG_POWER_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_POWER(...)
-#define LOG_POWER_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_DETAILS
-#define LOG_CONTROLLER(...) Serial.print(__VA_ARGS__)
-#define LOG_CONTROLLER_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_CONTROLLER(...)
-#define LOG_CONTROLLER_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
-#define LOG_DISPLAY(...) Serial.print(__VA_ARGS__)
-#define LOG_DISPLAY_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_DISPLAY(...)
-#define LOG_DISPLAY_LN(...)
-#endif
-
-#if LOG_LEVEL >= LOG_LEVEL_VERBOSE
-#define LOG_I2C_DEVS(...) Serial.print(__VA_ARGS__)
-#define LOG_I2C_DEVS_LN(...) Serial.println(__VA_ARGS__)
-#else
-#define LOG_I2C_DEVS(...)
-#define LOG_I2C_DEVS_LN(...)
-#endif
 
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))

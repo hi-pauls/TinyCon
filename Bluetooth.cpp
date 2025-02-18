@@ -46,16 +46,16 @@ void BluetoothController::Init()
     Bluefruit.Advertising.setInterval(32, 244);
     Bluefruit.Advertising.setFastTimeout(30);
 
-    LOG_BLUETOOTH_LN("Bluetooth initialized");
+    LogBluetooth::Info("Bluetooth initialized", Tiny::TIEndl);
 }
 
 void BluetoothController::Update(uint32_t deltaTime)
 {
-    LOG_BLUETOOTH("Bluetooth: ");
+    LogBluetooth::Info("Bluetooth: ");
     if (!Processor.GetBLEEnabled() || !Active)
     {
-        if (!Processor.GetBLEEnabled()) LOG_BLUETOOTH("Disabled");
-        else LOG_BLUETOOTH("Inactive");
+        if (!Processor.GetBLEEnabled()) LogBluetooth::Info("Disabled");
+        else LogBluetooth::Info("Inactive");
 
         if (Active || Connected)
         {
@@ -67,12 +67,12 @@ void BluetoothController::Update(uint32_t deltaTime)
 
             if (Bluefruit.connected())
             {
-                LOG_BLUETOOTH(", Disconnect");
+                LogBluetooth::Debug(", Disconnect");
                 Bluefruit.disconnect(ConnectionId);
             }
 
             if (Bluefruit.getTxPower() > -40) Bluefruit.setTxPower(-40);
-            LOG_BLUETOOTH(", Stop");
+            LogBluetooth::Debug(", Stop");
         }
     }
     else if (ForceAdvertise || AdvertisingTimeout > 0)
@@ -80,7 +80,7 @@ void BluetoothController::Update(uint32_t deltaTime)
         if (AdvertisingTimeout <= 0 || !AdvertisingStarted)
         {
             // Previous advertising has timed out, reinitialize
-            LOG_BLUETOOTH("Enable Advertising, ");
+            LogBluetooth::Debug("Enable Advertising, ");
             Bluefruit.Advertising.start(0);
             AdvertisingStarted = true;
         }
@@ -88,23 +88,23 @@ void BluetoothController::Update(uint32_t deltaTime)
         if (ForceAdvertise)
         {
             // One-time trigger flag
-            LOG_BLUETOOTH("Force Advertise, ");
+            LogBluetooth::Debug("Force Advertise, ");
             ForceAdvertise = false;
             AdvertisingTimeout = AdvertisingTime;
 
             if (Bluefruit.connected())
             {
-                LOG_BLUETOOTH("Disconnect, ");
+                LogBluetooth::Debug("Disconnect, ");
                 Bluefruit.disconnect(ConnectionId);
             }
 
             if (Bluefruit.getTxPower() < 4) Bluefruit.setTxPower(4);
-            LOG_BLUETOOTH("Start");
+            LogBluetooth::Debug("Start");
         }
         else if (Bluefruit.connected())
         {
             // Connected during advertising, stop advertising
-            LOG_BLUETOOTH("Connected, Stop Advertising");
+            LogBluetooth::Debug("Connected, Stop Advertising");
             Bluefruit.Advertising.stop();
             AdvertisingStarted = false;
             AdvertisingTimeout = 0;
@@ -114,35 +114,35 @@ void BluetoothController::Update(uint32_t deltaTime)
             AdvertisingTimeout -= deltaTime;
             if (AdvertisingTimeout <= 0)
             {
-                LOG_BLUETOOTH("Timeout");
+                LogBluetooth::Debug("Timeout");
                 Bluefruit.Advertising.stop();
                 AdvertisingStarted = false;
                 Active = false;
             }
-            else LOG_BLUETOOTH("Advertising");
+            else LogBluetooth::Info("Advertising");
         }
     }
     else if (Bluefruit.connected())
     {
         Connected = true;
 
-        LOG_BLUETOOTH("Controller");
+        LogBluetooth::Debug("Controller");
         ConnectionId = Bluefruit.connHandle();
         auto report = Controller.MakeHidReport();
         GamepadService.report(&report);
 
-        LOG_BLUETOOTH(", MPU");
+        LogBluetooth::Debug(", MPU");
         uint8_t data[GamepadController::MaxControllers * 41];
         std::size_t size = Controller.MakeMpuBuffer({data, sizeof(data)});
         MpuCharacteristic.notify(data, size);
     }
     else
     {
-        LOG_BLUETOOTH("Disconnected");
+        LogBluetooth::Debug("Disconnected");
         ForceAdvertise = true;
     }
 
-    LOG_BLUETOOTH_LN();
+    LogBluetooth::Info(Tiny::TIEndl);
 }
 
 #endif

@@ -1,6 +1,6 @@
 #include "TinyController.h"
 
-void TinyController::Init()
+using LogState = Tiny::TILogTarget<TinyCon::StateLogLevel>;
 {
     Controller.Init();
     Power.Init();
@@ -12,7 +12,6 @@ void TinyController::Init()
 #if !NO_USB
     USBControl.Init();
     USBControl.SetActive(Power.PowerSource == PowerSources::USB);
-    LOG_USB_LN("USB initialized");
 #endif
 
 #if !NO_BLE
@@ -30,7 +29,7 @@ void TinyController::Update(int32_t deltaTime)
     bool usbNeedsUpdate = !i2cNeedsUpdate && !Bluetooth.IsConnected() && USBControl.IsActive();
     if (i2cNeedsUpdate || bluetoothNeedsUpdate || usbNeedsUpdate)
     {
-        LOG_STATE_LN("State: Updating");
+        LogState::Info("State: Updating", Tiny::TIEndl);
         Controller.Update(deltaTime);
         if (bluetoothNeedsUpdate) Bluetooth.Update(deltaTime);
         if (usbNeedsUpdate) USBControl.Update();
@@ -39,7 +38,7 @@ void TinyController::Update(int32_t deltaTime)
     }
     else
     {
-        LOG_STATE_LN("State: Suspended");
+        LogState::Info("State: Suspended", Tiny::TIEndl);
         UpdateSelectButton(deltaTime, Controller.GetUpdatedButton(0, BluetoothStartButtonIndex));
         Suspended = true;
     }
@@ -50,22 +49,22 @@ void TinyController::Update(int32_t deltaTime)
     bool powerIsUsb = Power.PowerSource == PowerSources::USB;
     if (Power.PowerSource == PowerSources::I2C)
     {
-        LOG_STATE_LN("I2C connected, disable USB and Bluetooth (again)");
+        LogState::Debug("I2C connected, disable USB and Bluetooth (again)", Tiny::TIEndl);
         USBControl.SetActive(false);
         Bluetooth.SetActive(false);
     }
     else if (powerWasI2c)
     {
-        LOG_STATE("I2C disconnected, ");
+        LogState::Debug("I2C disconnected, ");
         if (powerIsUsb)
         {
-            LOG_STATE_LN("USB power, enabling USB, disabling Bluetooth");
+            LogState::Debug("USB power, enabling USB, disabling Bluetooth", Tiny::TIEndl);
             USBControl.SetActive(true);
             Bluetooth.SetActive(false);
         }
         else
         {
-            LOG_STATE_LN("Battery power, enabling Bluetooth, disabling USB");
+            LogState::Debug("Battery power, enabling Bluetooth, disabling USB", Tiny::TIEndl);
             USBControl.SetActive(false);
             Bluetooth.SetActive(true);
         }
@@ -74,20 +73,20 @@ void TinyController::Update(int32_t deltaTime)
     {
         if (!powerWasUsb)
         {
-            LOG_STATE_LN("USB connected, disabling Bluetooth");
+            LogState::Debug("USB connected, disabling Bluetooth", Tiny::TIEndl);
             USBControl.SetActive(true);
             Bluetooth.SetActive(false);
         }
         else if (bluetoothWasConnected && !Bluetooth.IsConnected())
         {
-            LOG_STATE_LN("Forced Bluetooth on USB disconnect, enabling USB, stopping auto-advertising");
+            LogState::Debug("Forced Bluetooth on USB disconnect, enabling USB, stopping auto-advertising", Tiny::TIEndl);
             USBControl.SetActive(true);
             Bluetooth.SetActive(false);
         }
     }
     else if (powerWasUsb)
     {
-        LOG_STATE_LN("USB disconnected, enabling Bluetooth");
+        LogState::Debug("USB disconnected, enabling Bluetooth", Tiny::TIEndl);
         USBControl.SetActive(false);
         Bluetooth.SetActive(true);
     }
@@ -101,7 +100,7 @@ void TinyController::UpdateSelectButton(int32_t deltaTime, bool selectButton)
         if (BluetoothStartPressedTimeout > 0) BluetoothStartPressedTimeout -= deltaTime;
         else
         {
-            LOG_STATE_LN("Bluetooth Button Triggered");
+            LogState::Info("Bluetooth Button Triggered", Tiny::TIEndl);
             Bluetooth.SetActive(!Bluetooth.IsActive());
             if (!Bluetooth.IsActive() && Power.PowerSource == PowerSources::USB) USBControl.SetActive(true);
             BluetoothStartPressedTimeout = BluetoothStartButtonTime;

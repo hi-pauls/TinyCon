@@ -75,34 +75,40 @@ void TinyCon::IndicatorController::UpdateDisplay(char mode)
 
             if (Controller.GetButton(i))
                     for (auto y = 0; y < buttonHeight - 1; ++y)
-                        SSD1306.drawFastHLine(buttonX, buttonY + y, buttonWidth - 1, 1);
-            }
+                    SSD1306.drawFastHLine(buttonX, buttonY + y, buttonWidth - 1, 1);
+        }
 
-            if (Controller.GetMpuPresent(c))
+        auto mpuCount = Controller.GetMpuCount();
+        auto mpuHeight = DisplayHeight / mpuCount;
+        for (int8_t mpuY = 0, mpuIndex = 0; mpuIndex < GamepadController::MaxMpuControllers; mpuY += mpuHeight, ++mpuIndex)
+        {
+            for (;!Controller.GetMpuPresent(mpuIndex) && mpuIndex < GamepadController::MaxMpuControllers; mpuIndex++);
+
+            if (Controller.GetMpuPresent(mpuIndex))
             {
                 // MPU has 3x3 axis per controller, + and - for each axis, using vertical bars spanning the given width
-                auto mpuCenter = ControllerHeight / 2;
+                auto mpuCenter = mpuHeight / 2;
                 auto barWidth = MpuWidth / (3 * 3);
-                auto acceleration = Controller.GetAcceleration(c);
-                auto angularVelocity = Controller.GetAngularVelocity(c);
-                auto orientation = Controller.GetOrientation(c);
+                auto acceleration = Controller.GetAcceleration(mpuIndex);
+                auto angularVelocity = Controller.GetAngularVelocity(mpuIndex);
+                auto orientation = Controller.GetOrientation(mpuIndex);
                 int8_t bars[] =
                     {
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AccelerationScale, Max(-AccelerationScale, acceleration.X/ AccelerationScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AccelerationScale, Max(-AccelerationScale, acceleration.Y/ AccelerationScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AccelerationScale, Max(-AccelerationScale, acceleration.Z/ AccelerationScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AngularVelocityScale, Max(-AngularVelocityScale, angularVelocity.X/ AngularVelocityScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AngularVelocityScale, Max(-AngularVelocityScale, angularVelocity.Y/ AngularVelocityScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(AngularVelocityScale, Max(-AngularVelocityScale, angularVelocity.Z/ AngularVelocityScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(OrientationScale, Max(-OrientationScale, orientation.X/ OrientationScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(OrientationScale, Max(-OrientationScale, orientation.Y/ OrientationScale)) * mpuCenter),
-                        static_cast<int8_t>(controllerY + mpuCenter + Min(OrientationScale, Max(-OrientationScale, orientation.Z/ OrientationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AccelerationScale, Tiny::Math::Max(-AccelerationScale, acceleration.X/ AccelerationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AccelerationScale, Tiny::Math::Max(-AccelerationScale, acceleration.Y/ AccelerationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AccelerationScale, Tiny::Math::Max(-AccelerationScale, acceleration.Z/ AccelerationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AngularVelocityScale, Tiny::Math::Max(-AngularVelocityScale, angularVelocity.X/ AngularVelocityScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AngularVelocityScale, Tiny::Math::Max(-AngularVelocityScale, angularVelocity.Y/ AngularVelocityScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(AngularVelocityScale, Tiny::Math::Max(-AngularVelocityScale, angularVelocity.Z/ AngularVelocityScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(OrientationScale, Tiny::Math::Max(-OrientationScale, orientation.X/ OrientationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(OrientationScale, Tiny::Math::Max(-OrientationScale, orientation.Y/ OrientationScale)) * mpuCenter),
+                        static_cast<int8_t>(mpuY + mpuCenter + Tiny::Math::Min(OrientationScale, Tiny::Math::Max(-OrientationScale, orientation.Z/ OrientationScale)) * mpuCenter),
                     };
-                mpuCenter += controllerY;
+                mpuCenter += mpuY;
                 for (uint32_t i = 0, barX = MpuStart; i < sizeof(bars) / sizeof(bars[0]); ++i, barX += barWidth)
                 {
-                    auto from = Min(bars[i], mpuCenter);
-                    auto to = Min(Max(bars[i], mpuCenter), controllerY + ControllerHeight - 1);
+                    auto from = Tiny::Math::Min(bars[i], mpuCenter);
+                    auto to = Tiny::Math::Min(Tiny::Math::Max(bars[i], mpuCenter), mpuY + mpuHeight - 1);
                     if (from >= to) to = from + 1;
                     for (auto y = from; y < to; ++y) SSD1306.drawFastHLine(barX, y, barWidth - 1, 1);
                 }

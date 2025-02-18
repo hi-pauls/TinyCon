@@ -139,7 +139,9 @@ void TinyCon::IndicatorController::Disable()
     if (!Suspended)
     {
 #if USE_NEOPIXEL
-        SetRgb(LedEffects::Off, LedEffects::Off, LedEffects::Off);
+        SetRgbRed(LedEffects::Off);
+        SetRgbGreen(LedEffects::Off);
+        SetRgbBlue(LedEffects::Off);
         UpdateRgb(0);
 #endif
 
@@ -237,5 +239,11 @@ void TinyCon::IndicatorController::UpdateRgb(uint32_t deltaTime)
     UpdateLed(deltaTime, RgbGreenValue, RgbGreenEffectTime, RgbGreenEffect, NextRgbGreenEffect);
     UpdateLed(deltaTime, RgbBlueValue, RgbBlueEffectTime, RgbBlueEffect, NextRgbBlueEffect);
     SetRgb(RgbRedValue, RgbGreenValue, RgbBlueValue);
+}
+void TinyCon::IndicatorController::SetRgbColor(TinyCon::IndicatorController::LedEffects nextEffect, uint8_t nextValue,
+                                               TinyCon::IndicatorController::LedEffects &currentEffect, uint8_t &currentValue)
+{
+    currentEffect = nextEffect;
+    if (nextEffect == LedEffects::Fixed) currentValue = nextValue;
 }
 #endif

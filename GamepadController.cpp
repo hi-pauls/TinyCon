@@ -88,29 +88,31 @@ hid_gamepad_report_t TinyCon::GamepadController::MakeHidReport() const
 
     // XXX: Figure out how we can support more than 2+1 axis per controller
     // Assume any extra axis is 0-ed if not available or the controller is disabled
-    report.x = Inputs[0].Axis[0] * 127;
-    report.y = Inputs[0].Axis[1] * 127;
-    report.z = Inputs[1].Axis[0] * 127;
-    report.rz = Inputs[1].Axis[1] * 127;
-    report.rx = Inputs[0].Axis[2] * 127;
-    report.ry = Inputs[1].Axis[2] * 127;
+    report.x = GetAxis(0) * 127;
+    report.y = GetAxis(1) * 127;
+    report.z = GetAxis(2) * 127;
+    report.rz = GetAxis(3) * 127;
+    report.rx = GetAxis(4) * 127;
+    report.ry = GetAxis(5) * 127;
 
-    // Figure out the head, clock-wise starting at the top position button
-    if (Inputs[1].Buttons[0] && Inputs[1].Buttons[3]) report.hat = GAMEPAD_HAT_UP_LEFT;
-    else if (Inputs[1].Buttons[0] && Inputs[1].Buttons[1]) report.hat = GAMEPAD_HAT_UP_RIGHT;
-    else if (Inputs[1].Buttons[0]) report.hat = GAMEPAD_HAT_UP;
-    else if (Inputs[1].Buttons[1] && Inputs[1].Buttons[2]) report.hat = GAMEPAD_HAT_DOWN_RIGHT;
-    else if (Inputs[1].Buttons[1]) report.hat = GAMEPAD_HAT_RIGHT;
-    else if (Inputs[1].Buttons[2] && Inputs[1].Buttons[3]) report.hat = GAMEPAD_HAT_DOWN_LEFT;
-    else if (Inputs[1].Buttons[2]) report.hat = GAMEPAD_HAT_DOWN;
-    else if (Inputs[1].Buttons[3]) report.hat = GAMEPAD_HAT_LEFT;
+    if (HatOffset < 0) report.hat = GAMEPAD_HAT_CENTERED;
+    else
+    {
+        // Figure out the hat, clock-wise starting at the top position button. Offsetting this by 5
+        if (GetButton(HatOffset) && GetButton(HatOffset + 3)) report.hat = GAMEPAD_HAT_UP_LEFT;
+        else if (GetButton(HatOffset) && GetButton(HatOffset + 1)) report.hat = GAMEPAD_HAT_UP_RIGHT;
+        else if (GetButton(HatOffset)) report.hat = GAMEPAD_HAT_UP;
+        else if (GetButton(HatOffset + 1) && GetButton(HatOffset + 2)) report.hat = GAMEPAD_HAT_DOWN_RIGHT;
+        else if (GetButton(HatOffset + 1)) report.hat = GAMEPAD_HAT_RIGHT;
+        else if (GetButton(HatOffset + 2) && GetButton(HatOffset + 3)) report.hat = GAMEPAD_HAT_DOWN_LEFT;
+        else if (GetButton(HatOffset + 2)) report.hat = GAMEPAD_HAT_DOWN;
+        else if (GetButton(HatOffset + 3)) report.hat = GAMEPAD_HAT_LEFT;
+        else report.hat = GAMEPAD_HAT_CENTERED;
+    }
 
-    // XXX: Figure out how to support more than 16 buttons per controller
-    // Assume any extra buttons are 0-ed if not available or the controller is disabled
-    // We are offsetting the report of the right buttons by 4 because they are already accounted for with the head.
-    for (int8_t index = 0; index < 16; ++index)
-        if (index < 12) report.buttons |= (Inputs[0].Buttons[index] << index) | (Inputs[1].Buttons[index + 4] << (index + 16));
-        else report.buttons |= Inputs[0].Buttons[index] << index;
+    for (int8_t index = 0; index < 32; ++index)
+        if (HatOffset < 0 || index < HatOffset) report.buttons |= GetButton(index) << (index);
+        else report.buttons |= GetButton(index + 4) << (index);
     return report;
 }
 #endif

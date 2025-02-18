@@ -37,7 +37,7 @@ private:
     uint8_t RegisterAddress = 0;
     uint32_t Timeout = 200;
     uint32_t LastInputTime = 0;
-    uint8_t Buffer[14] = {};
+        std::array<uint8_t, 14> Buffer = {};
     uint8_t BufferIndex = 0;
 };
 

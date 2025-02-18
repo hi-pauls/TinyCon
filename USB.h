@@ -35,7 +35,7 @@ public:
     };
 
 private:
-    static constexpr int16_t MpuReportSize = 21 * GamepadController::MaxControllers;
+    static constexpr int16_t MpuReportSize = 21 * GamepadController::MaxMpuControllers;
     static constexpr uint8_t HidDescriptor[] =
         {
             TUD_HID_REPORT_DESC_GAMEPAD(HID_REPORT_ID(ReportGamepad)),

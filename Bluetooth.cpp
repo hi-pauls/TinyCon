@@ -2,6 +2,8 @@
 #include "Bluetooth.h"
 #include "CommandProcessor.h"
 
+using LogBluetooth = Tiny::TILogTarget<TinyCon::BluetoothLogLevel>;
+
 #if !NO_BLE
 std::function<void(uint16_t, BLECharacteristic*, uint8_t*, uint16_t)> TinyCon::BluetoothController::HapticWriteCallback =
         [](uint16_t, BLECharacteristic*, uint8_t*, uint16_t) {};

@@ -21,7 +21,7 @@ namespace
         // 0x01, Mode = 0x00 for lib, 0x05 for realtime
         // 0x1D, 0x04 for Waveform, 0x0E for realtime, 0x1 is open loop, should be false
         WriteRegister(wire, address, 0x01, mode);
-        if (mode == DRV2605Controller::DRV2605_MODE_INTTRIG) WriteRegister(wire, address, 0x1D, 0x00);
+        if (mode == TinyCon::DRV2605Controller::DRV2605_MODE_INTTRIG) WriteRegister(wire, address, 0x1D, 0x00);
         else WriteRegister(wire, address, 0x1D, 0x0A);
     }
 
@@ -41,21 +41,21 @@ namespace
     }
 }
 
-void DRV2605Controller::Init(TwoWire& wire)
+void TinyCon::DRV2605Controller::Init(TwoWire& wire)
 {
     SoftwareMode = false;
     I2C.Hardware = &wire;
     Init();
 }
 
-void DRV2605Controller::Init(SoftWire& wire)
+void TinyCon::DRV2605Controller::Init(SoftWire& wire)
 {
     SoftwareMode = true;
     I2C.Software = &wire;
     Init();
 }
 
-void DRV2605Controller::Init()
+void TinyCon::DRV2605Controller::Init()
 {
     if (SoftwareMode)
     {
@@ -76,7 +76,7 @@ void DRV2605Controller::Init()
     }
 }
 
-void DRV2605Controller::PlayRealtime(uint8_t value)
+void TinyCon::DRV2605Controller::PlayRealtime(uint8_t value)
 {
     if (!Present) LogHaptic::Info(", No DRV2605");
 
@@ -92,7 +92,7 @@ void DRV2605Controller::PlayRealtime(uint8_t value)
     else WriteRegister(*I2C.Hardware, 0x5A, 0x02, value);
 }
 
-void DRV2605Controller::PlayWaveform(const uint8_t* data)
+void TinyCon::DRV2605Controller::PlayWaveform(const uint8_t* data)
 {
     if (!Present) LogHaptic::Info(", No DRV2605");
 
@@ -123,7 +123,7 @@ void DRV2605Controller::PlayWaveform(const uint8_t* data)
     else WriteRegister(*I2C.Hardware, 0x5A, 0x0C, 0x01);
 }
 
-void DRV2605Controller::Stop()
+void TinyCon::DRV2605Controller::Stop()
 {
     // 0x0C Go, 0x00 Stop
     if (SoftwareMode)
@@ -138,19 +138,19 @@ void DRV2605Controller::Stop()
     }
 }
 
-void HapticController::Init(TwoWire& wire)
+void TinyCon::HapticController::Init(TwoWire& wire)
 {
     DRV2605.Init(wire);
     Present = DRV2605.Present;
 }
 
-void HapticController::Init(SoftWire& wire)
+void TinyCon::HapticController::Init(SoftWire& wire)
 {
     DRV2605.Init(wire);
     Present = DRV2605.Present;
 }
 
-void HapticController::Insert(uint8_t command, uint8_t count, const uint8_t* data, uint16_t duration)
+void TinyCon::HapticController::Insert(uint8_t command, uint8_t count, const uint8_t* data, uint16_t duration)
 {
     Commands[Head].Command = static_cast<HapticCommands>(command);
     Commands[Head].Count = count;
@@ -164,7 +164,7 @@ void HapticController::Insert(uint8_t command, uint8_t count, const uint8_t* dat
         Tail = (Tail + 1) & 7;
 }
 
-void HapticController::Update(int32_t deltaTime)
+void TinyCon::HapticController::Update(int32_t deltaTime)
 {
     if (!Present && Enabled)
     {
@@ -193,7 +193,7 @@ void HapticController::Update(int32_t deltaTime)
     }
 }
 
-bool HapticController::HasNewCommand(int32_t deltaTime)
+bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
 {
     if (Tail == Head) { LogHaptic::Info(", Finished"); return false; }
 
@@ -239,7 +239,7 @@ bool HapticController::HasNewCommand(int32_t deltaTime)
     return Tail != Head;
 }
 
-void HapticController::RemoveHapticCommand(int8_t index)
+void TinyCon::HapticController::RemoveHapticCommand(int8_t index)
 {
     index = GetCommandIndex(index);
     Commands[index].Command = HapticCommands::Noop;

@@ -7,7 +7,7 @@ using LogIndicators = Tiny::TILogTarget<TinyCon::IndicatorLogLevel>;
     LogIndicators::Debug("Indicators initialized", Tiny::TIEndl);
 }
 
-void IndicatorController::Update(uint32_t deltaTime, char mode)
+void TinyCon::IndicatorController::Update(uint32_t deltaTime, char mode)
 {
     UpdateBlue(deltaTime);
     UpdateRed(deltaTime);
@@ -22,7 +22,7 @@ void IndicatorController::Update(uint32_t deltaTime, char mode)
 }
 
 #if USE_OLED
-void IndicatorController::UpdateDisplay(char mode)
+void TinyCon::IndicatorController::UpdateDisplay(char mode)
 {
     if (!DisplayPresent)
     {
@@ -134,7 +134,7 @@ void IndicatorController::UpdateDisplay(char mode)
     }
 }
 
-void IndicatorController::Disable()
+void TinyCon::IndicatorController::Disable()
 {
     if (!Suspended)
     {
@@ -156,7 +156,7 @@ void IndicatorController::Disable()
 }
 #endif
 
-void IndicatorController::UpdateLed(uint32_t deltaTime, uint8_t& value, int32_t& time, LedEffects& current, LedEffects& next)
+void TinyCon::IndicatorController::UpdateLed(uint32_t deltaTime, uint8_t& value, int32_t& time, LedEffects& current, LedEffects& next)
 {
     time -= deltaTime;
     switch (current)
@@ -210,20 +210,20 @@ void IndicatorController::UpdateLed(uint32_t deltaTime, uint8_t& value, int32_t&
     }
 }
 
-void IndicatorController::UpdateBlue(uint32_t deltaTime)
+void TinyCon::IndicatorController::UpdateBlue(uint32_t deltaTime)
 {
     UpdateLed(deltaTime, BlueEffectValue, BlueEffectTime, BlueEffect, NextBlueEffect);
     analogWrite(BlueLedPin, BlueEffectValue);
 }
 
-void IndicatorController::UpdateRed(uint32_t deltaTime)
+void TinyCon::IndicatorController::UpdateRed(uint32_t deltaTime)
 {
     UpdateLed(deltaTime, RedEffectValue, RedEffectTime, RedEffect, NextRedEffect);
     analogWrite(RedLedPin, RedEffectValue);
 }
 
 #if USE_NEOPIXEL
-void DisplayController::UpdateRgb(uint32_t deltaTime)
+void TinyCon::IndicatorController::UpdateRgb(uint32_t deltaTime)
 {
     UpdateLed(deltaTime, RgbRedValue, RgbRedEffectTime, RgbRedEffect, NextRgbRedEffect);
     UpdateLed(deltaTime, RgbGreenValue, RgbGreenEffectTime, RgbGreenEffect, NextRgbGreenEffect);

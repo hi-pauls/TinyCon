@@ -40,7 +40,7 @@ extern "C" { void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) { SlaveI2C.
 TwoWire& MasterI2C0 = Wire;
 SoftWire MasterI2C1{5, 0};
 uint8_t MasterI2C1Buffer[10] = {};
-TinyController Controller(SlaveI2C, MasterI2C0, MasterI2C1);
+TinyCon::TinyController Controller(SlaveI2C, MasterI2C0, MasterI2C1);
 
 #if USE_HAPTICTEST
 uint8_t HapticCommand = 0;

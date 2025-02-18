@@ -7,6 +7,8 @@
 #include <Arduino.h>
 #include <Adafruit_ICM20948.h>
 
+namespace TinyCon
+{
 enum class MpuTypes : uint8_t
 {
     None = 0,
@@ -71,3 +73,4 @@ private:
     AccelerometerRanges AccelerationRange = AccelerometerRanges::G16;
     GyroscopeRanges GyroscopeRange = GyroscopeRanges::D2000;
 };
+}

@@ -22,6 +22,8 @@ public:
 #else
 #include <Adafruit_TinyUSB.h>
 
+namespace TinyCon
+{
 class USBController
 {
 public:
@@ -64,3 +66,4 @@ private:
     CommandProcessor& Processor;
 };
 #endif
+}

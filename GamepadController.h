@@ -15,6 +15,8 @@
 #include <Adafruit_TinyUSB.h>
 #endif
 
+namespace TinyCon
+{
 class GamepadController
 {
 public:
@@ -84,3 +86,4 @@ private:
     MpuController Mpus[MaxControllers];
     InputController Inputs[MaxControllers];
 };
+}

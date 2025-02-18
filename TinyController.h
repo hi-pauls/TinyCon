@@ -14,6 +14,8 @@
 #include <Wire.h>
 #include <SoftWire.h>
 
+namespace TinyCon
+{
 class TinyController
 {
     static constexpr auto BluetoothStartButtonIndex = 4;
@@ -48,3 +50,4 @@ private:
 
     void UpdateSelectButton(int32_t deltaTime, bool selectButton);
 };
+}

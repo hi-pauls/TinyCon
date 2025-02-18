@@ -7,6 +7,8 @@
 
 #include <functional>
 
+namespace TinyCon
+{
 #if NO_BLE
 class BluetoothController
 {
@@ -67,3 +69,4 @@ private:
     CommandProcessor& Processor;
 };
 #endif
+}

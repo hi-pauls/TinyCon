@@ -14,7 +14,7 @@ using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
     }
 }
 
-void GamepadController::Update(uint32_t deltaTime)
+void TinyCon::GamepadController::Update(uint32_t deltaTime)
 {
     if constexpr (Tiny::GlobalLogThreshold >= Tiny::TILogLevel::Verbose)
     {
@@ -85,7 +85,7 @@ void GamepadController::Update(uint32_t deltaTime)
 }
 
 #if !NO_BLE || !NO_USB
-hid_gamepad_report_t GamepadController::MakeHidReport() const
+hid_gamepad_report_t TinyCon::GamepadController::MakeHidReport() const
 {
     hid_gamepad_report_t report = {};
 
@@ -118,7 +118,7 @@ hid_gamepad_report_t GamepadController::MakeHidReport() const
 }
 #endif
 
-std::size_t GamepadController::MakeMpuBuffer(Span data) const
+std::size_t TinyCon::GamepadController::MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
     auto size = 0;
     for (auto& mpu : Mpus)
@@ -127,7 +127,7 @@ std::size_t GamepadController::MakeMpuBuffer(Span data) const
     return size;
 }
 
-void GamepadController::AddHapticCommand(Span data)
+void TinyCon::GamepadController::AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data)
 {
     uint8_t controller = data.Data[0];
     uint8_t command = data.Data[1];

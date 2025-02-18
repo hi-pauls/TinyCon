@@ -1,6 +1,8 @@
 #include "Power.h"
 
 using LogPower = Tiny::TILogTarget<TinyCon::PowerLogLevel>;
+
+void TinyCon::PowerController::Init()
 {
 #if defined(ADAFRUIT_FEATHER_ESP32S2)
     pinMode(PIN_I2C_POWER, INPUT);
@@ -28,7 +30,7 @@ using LogPower = Tiny::TILogTarget<TinyCon::PowerLogLevel>;
     Update();
 }
 
-void PowerController::Update()
+void TinyCon::PowerController::Update()
 {
     PowerSource = PowerSources::I2C;
 

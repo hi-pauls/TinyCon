@@ -7,6 +7,8 @@
 #include <Arduino.h>
 #include <Adafruit_seesaw.h>
 
+namespace TinyCon
+{
 enum class ControllerTypes : uint8_t
 {
     None = 0,
@@ -78,3 +80,4 @@ public:
 private:
     SeesawController Seesaw;
 };
+}

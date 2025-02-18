@@ -21,7 +21,7 @@ using LogState = Tiny::TILogTarget<TinyCon::StateLogLevel>;
     Indicators.Init();
 }
 
-void TinyController::Update(int32_t deltaTime)
+void TinyCon::TinyController::Update(int32_t deltaTime)
 {
     bool i2cNeedsUpdate = Power.PowerSource == PowerSources::I2C;
     bool bluetoothWasConnected = Bluetooth.IsConnected();
@@ -94,7 +94,7 @@ void TinyController::Update(int32_t deltaTime)
     UpdateIndicators(deltaTime);
 }
 
-void TinyController::UpdateSelectButton(int32_t deltaTime, bool selectButton)
+void TinyCon::TinyController::UpdateSelectButton(int32_t deltaTime, bool selectButton)
 {
     if (selectButton)
         if (BluetoothStartPressedTimeout > 0) BluetoothStartPressedTimeout -= deltaTime;
@@ -108,7 +108,7 @@ void TinyController::UpdateSelectButton(int32_t deltaTime, bool selectButton)
     else BluetoothStartPressedTimeout = BluetoothStartButtonTime;
 }
 
-void TinyController::UpdateIndicators(int32_t deltaTime)
+void TinyCon::TinyController::UpdateIndicators(int32_t deltaTime)
 {
     if (Suspended) Indicators.Disable();
     else

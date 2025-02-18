@@ -15,6 +15,8 @@
 
 #include <cstdint>
 
+namespace TinyCon
+{
 class IndicatorController
 {
 public:
@@ -99,3 +101,4 @@ private:
     void UpdateDisplay(char mode);
 #endif
 };
+}

@@ -2,7 +2,8 @@
 
 #include <Arduino.h>
 
-#define TINYCON_VERSION "0.1"
+namespace TinyCon
+{
     constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;
@@ -37,6 +38,6 @@
 #define NO_USB 0
 #define NO_BLE 0
 #define NO_SLAVE 0
-
+}
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))

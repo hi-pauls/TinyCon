@@ -1,6 +1,6 @@
 #include "CommandProcessor.h"
 
-void CommandProcessor::ProcessCommand(Span command)
+bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<uint8_t> command)
 {
     LastCommand = command.Data[0];
     LastParameter = command.Data[1];

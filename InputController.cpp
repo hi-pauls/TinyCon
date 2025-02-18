@@ -1,6 +1,6 @@
 #include "InputController.h"
 
-bool DebouncedButton::Get() const
+bool TinyCon::DebouncedButton::Get() const
 {
     int8_t count = 0;
     for (int8_t i = 0; i < 4; ++i)
@@ -8,20 +8,20 @@ bool DebouncedButton::Get() const
     return false;
 }
 
-void SeesawController::Init(TwoWire& i2c, int8_t controller)
+void TinyCon::SeesawController::Init(TwoWire& i2c, int8_t controller)
 {
     Device = {&i2c};
     Controller = controller;
     if ((Present = Device.begin(AddressByController[Controller]))) Init();
 }
 
-void SeesawController::Init()
+void TinyCon::SeesawController::Init()
 {
     Device.pinModeBulk(InputButtonMask, INPUT_PULLUP);
     Device.setGPIOInterrupts(InputButtonMask, 1);
 }
 
-void SeesawController::Update()
+void TinyCon::SeesawController::Update()
 {
     if (!Present) return;
 
@@ -44,19 +44,19 @@ void SeesawController::Update()
         Axis[i] = Device.analogRead(InputAxis[i]) / 512.0f - 1.0f;
 }
 
-bool SeesawController::GetUpdatedButton(int8_t index)
+bool TinyCon::SeesawController::GetUpdatedButton(int8_t index)
 {
     const auto mask = InputButtons[index];
     return Device.digitalReadBulk(mask) == 0;
 }
 
-void InputController::Init(TwoWire& i2c, int8_t controller)
+void TinyCon::PinsInputController::Update()
 {
     if (controller < 4) Seesaw.Init(i2c, controller);
     Present = Seesaw.Present;
 }
 
-void InputController::Update()
+void TinyCon::InputController::Update()
 {
     int8_t axisIndex = 0;
     int8_t buttonIndex = 0;
@@ -68,7 +68,7 @@ void InputController::Update()
     }
 }
 
-bool InputController::GetUpdatedButton(int8_t index)
+bool TinyCon::InputController::GetUpdatedButton(int8_t index)
 {
     return Seesaw.Present && Seesaw.GetUpdatedButton(index);
 }

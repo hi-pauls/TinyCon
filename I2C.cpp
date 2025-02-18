@@ -3,11 +3,13 @@
 #include "HapticController.h"
 
 using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
-std::function<void()> I2CController::I2CRequestCallback = []() {};
-void I2CController::I2CSlaveReceive(int count) { I2CReceiveCallback(count); }
-void I2CController::I2CSlaveRequest() { I2CRequestCallback(); }
 
-void I2CController::Init()
+std::function<void(int)> TinyCon::I2CController::I2CReceiveCallback = [](int) {};
+std::function<void()> TinyCon::I2CController::I2CRequestCallback = []() {};
+void TinyCon::I2CController::I2CSlaveReceive(int count) { I2CReceiveCallback(count); }
+void TinyCon::I2CController::I2CSlaveRequest() { I2CRequestCallback(); }
+
+void TinyCon::I2CController::Init()
 {
     I2CReceiveCallback = [this](int count)
         {

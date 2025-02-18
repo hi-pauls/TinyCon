@@ -10,6 +10,8 @@
 #include <Adafruit_LC709203F.h>
 #endif
 
+namespace TinyCon
+{
 enum class PowerSources : int8_t
 {
     USB = 0,
@@ -47,3 +49,4 @@ private:
     Adafruit_LC709203F LC709203F;
 #endif
 };
+}

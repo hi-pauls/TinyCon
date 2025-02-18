@@ -11,6 +11,8 @@
 #include <Wire.h>
 #include <functional>
 
+namespace TinyCon
+{
 class I2CController
 {
 public:
@@ -38,3 +40,5 @@ private:
     uint8_t Buffer[14] = {};
     uint8_t BufferIndex = 0;
 };
+
+}

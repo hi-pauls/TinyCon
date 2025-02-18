@@ -1,12 +1,12 @@
 #include "MpuController.h"
 
-void MpuController::Init(TwoWire& i2c, int8_t controller)
+void TinyCon::MpuController::Init(TwoWire& i2c, int8_t controller)
 {
     I2C = &i2c;
     Controller = controller;
 }
 
-void MpuController::Update()
+void TinyCon::MpuController::Update()
 {
     if (!Icm20948Present)
     {
@@ -35,7 +35,7 @@ void MpuController::Update()
     }
 }
 
-std::size_t MpuController::FillBuffer(Span data) const
+std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
     auto size = 1;
     auto* current = const_cast<uint8_t*>(data.Data);
@@ -71,7 +71,7 @@ std::size_t MpuController::FillBuffer(Span data) const
     return size;
 }
 
-void MpuController::SetAccelerometerRange(AccelerometerRanges range)
+void TinyCon::MpuController::SetAccelerometerRange(AccelerometerRanges range)
 {
     AccelerationRange = range;
     if (Icm20948Present)
@@ -86,7 +86,7 @@ void MpuController::SetAccelerometerRange(AccelerometerRanges range)
     }
 }
 
-void MpuController::SetGyroscopeRange(GyroscopeRanges range)
+void TinyCon::MpuController::SetGyroscopeRange(GyroscopeRanges range)
 {
     GyroscopeRange = range;
     if (Icm20948Present)

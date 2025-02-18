@@ -7,6 +7,8 @@
 
 #include <cstdint>
 
+namespace TinyCon
+{
 class CommandProcessor
 {
 public:
@@ -32,3 +34,4 @@ private:
     bool USBEnabled = TINYCON_DEFAULT_USB_ENABLED;
     bool BLEEnabled = TINYCON_DEFAULT_BLE_ENABLED;
 };
+}

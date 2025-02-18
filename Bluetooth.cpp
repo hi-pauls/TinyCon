@@ -3,12 +3,12 @@
 #include "CommandProcessor.h"
 
 #if !NO_BLE
-std::function<void(uint16_t, BLECharacteristic*, uint8_t*, uint16_t)> BluetoothController::HapticWriteCallback =
+std::function<void(uint16_t, BLECharacteristic*, uint8_t*, uint16_t)> TinyCon::BluetoothController::HapticWriteCallback =
         [](uint16_t, BLECharacteristic*, uint8_t*, uint16_t) {};
-void BluetoothController::HapticWrite(uint16_t connection, BLECharacteristic *chr, uint8_t *data, uint16_t length)
+void TinyCon::BluetoothController::HapticWrite(uint16_t connection, BLECharacteristic *chr, uint8_t *data, uint16_t length)
 { HapticWriteCallback(connection, chr, data, length); }
 
-void BluetoothController::Init()
+void TinyCon::BluetoothController::Init()
 {
     Bluefruit.begin();
     Bluefruit.setTxPower(-40);
@@ -49,7 +49,7 @@ void BluetoothController::Init()
     LogBluetooth::Info("Bluetooth initialized", Tiny::TIEndl);
 }
 
-void BluetoothController::Update(uint32_t deltaTime)
+void TinyCon::BluetoothController::Update(uint32_t deltaTime)
 {
     LogBluetooth::Info("Bluetooth: ");
     if (!Processor.GetBLEEnabled() || !Active)

@@ -108,3 +108,7 @@ void loop()
         if (updateTime < UpdateFrequency) Watchdog.sleep(UpdateFrequency - updateTime);
     }
 }
+
+#if USE_ARDUINO_IDE
+void std::__throw_bad_function_call() { Serial.println("Bad function call"); while (true) {} }
+#endif

@@ -5,7 +5,7 @@
 #include "Utilities.h"
 #include "GamepadController.h"
 
-#include <Core/Drivers/Input/TITinyConTypes.h>
+#include "Core/Drivers/Input/TITinyConTypes.h"
 
 #include <cstdint>
 

@@ -134,7 +134,7 @@ void TinyCon::BluetoothController::Update(uint32_t deltaTime)
         GamepadService.report(&report);
 
         LogBluetooth::Debug(", MPU");
-        uint8_t data[GamepadController::MaxControllers * 41];
+        uint8_t data[GamepadController::MaxMpuControllers * 41];
         std::size_t size = Controller.MakeMpuBuffer({data, sizeof(data)});
         MpuCharacteristic.notify(data, size);
     }

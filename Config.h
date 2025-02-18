@@ -37,7 +37,7 @@ namespace TinyCon
 
 #define NO_USB 0
 #define NO_BLE 0
-#define NO_SLAVE 0
+    #define NO_I2C_SLAVE 0
 }
 #define Min(a, b) ((a) < (b) ? (a) : (b))
 #define Max(a, b) ((a) > (b) ? (a) : (b))

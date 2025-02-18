@@ -29,7 +29,7 @@
 
 #include <cstdint>
 
-#if !NO_SLAVE
+#if !NO_I2C_SLAVE
 #include <nordic/nrfx/mdk/nrf52840.h>
 constexpr auto SlaveScl = 12;
 constexpr auto SlaveSda = 11;
@@ -81,7 +81,7 @@ void setup()
     MasterI2C1.setTimeout_ms(10);
     MasterI2C1.setClock(400000);
 
-#if !NO_SLAVE
+#if !NO_I2C_SLAVE
     SlaveI2C.begin(0x44);
 #endif
 

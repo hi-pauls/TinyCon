@@ -5,7 +5,7 @@ using LogState = Tiny::TILogTarget<TinyCon::StateLogLevel>;
     Controller.Init();
     Power.Init();
 
-#if !NO_SLAVE
+#if !NO_I2C_SLAVE
     I2C.Init();
 #endif
 

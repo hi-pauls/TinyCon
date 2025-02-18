@@ -1,6 +1,8 @@
 #include "Indicators.h"
 
 using LogIndicators = Tiny::TILogTarget<TinyCon::IndicatorLogLevel>;
+
+void TinyCon::IndicatorController::Init()
 {
     pinMode(BlueLedPin, OUTPUT);
     pinMode(RedLedPin, OUTPUT);
@@ -74,7 +76,7 @@ void TinyCon::IndicatorController::UpdateDisplay(char mode)
             }
 
             if (Controller.GetButton(i))
-                    for (auto y = 0; y < buttonHeight - 1; ++y)
+                for (auto y = 0; y < buttonHeight - 1; ++y)
                     SSD1306.drawFastHLine(buttonX, buttonY + y, buttonWidth - 1, 1);
         }
 

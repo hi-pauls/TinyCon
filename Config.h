@@ -34,14 +34,12 @@ namespace TinyCon
 #define LED_RED -1
 #endif
 
-#define USE_OLED 1
-#define USE_LC709203 0
-#define USE_NEOPIXEL 0
-#define USE_HAPTICTEST 0
+    #define USE_OLED 1
+    #define USE_LC709203 0
+    #define USE_NEOPIXEL 1
+    #define USE_HAPTICTEST 0
 
-#define NO_USB 0
-#define NO_BLE 0
+    #define NO_USB 0
+    #define NO_BLE 0
     #define NO_I2C_SLAVE 0
 }
-#define Min(a, b) ((a) < (b) ? (a) : (b))
-#define Max(a, b) ((a) > (b) ? (a) : (b))

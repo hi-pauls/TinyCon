@@ -39,11 +39,11 @@ public:
     [[nodiscard]] HapticTypes GetHapticType(int8_t index) const { return Haptics[index].GetType(); }
     [[nodiscard]] ControllerTypes GetControllerType(int8_t index) const { return Inputs[index].GetType(); }
     [[nodiscard]] int8_t GetAxisCount(int8_t index) const { return Inputs[index].GetAxisCount(); }
-    [[nodiscard]] int8_t GetButtonCount(int8_t index) const { return Inputs[index].GetButtonCount(); }
+        [[nodiscard]] float GetAxis(int8_t axisIndex) const;
     [[nodiscard]] int8_t GetAxisCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetAxisCount(); return count; }
     [[nodiscard]] int8_t GetButtonCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetButtonCount(); return count; }
 
-    [[nodiscard]] bool GetMpuPresent(int8_t index) const { return Mpus[index].Present; }
+        [[nodiscard]] bool GetButton(int8_t buttonIndex) const;
     [[nodiscard]] bool GetControllerEnabled(int8_t index) const { return Inputs[index].Enabled; }
     void SetControllerEnabled(int8_t index, bool enabled) { Inputs[index].Enabled = enabled; }
     [[nodiscard]] bool GetAccelerationEnabled(int8_t index) const { return Mpus[index].AccelerationEnabled; }

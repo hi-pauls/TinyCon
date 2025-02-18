@@ -133,4 +133,18 @@ void TinyCon::GamepadController::AddHapticCommand(Tiny::Collections::TIFixedSpan
     uint16_t timeout = (data.Data[11] << 8) | data.Data[12];
     Haptics[controller].Insert(command, count, sequence, timeout);
             LogGamepad::Info("Add Haptic Command: ", controller, ", ", command, ", ", count, ", ", timeout, Tiny::TIEndl);
+float TinyCon::GamepadController::GetAxis(int8_t axisIndex) const
+{
+    for (auto& input : Inputs)
+        if (axisIndex < input.GetAxisCount()) return input.Axis[axisIndex];
+        else axisIndex -= input.GetAxisCount();
+    return 0.0f;
+}
+
+bool TinyCon::GamepadController::GetButton(int8_t buttonIndex) const
+{
+    for (auto& input : Inputs)
+        if (buttonIndex < input.GetButtonCount()) return input.Buttons[buttonIndex];
+        else buttonIndex -= input.GetButtonCount();
+    return false;
 }

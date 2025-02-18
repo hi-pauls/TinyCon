@@ -3,7 +3,10 @@
 using LogGamepad = Tiny::TILogTarget<TinyCon::GamepadLogLevel>;
 using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
 
-    // more, might be worth using an I2C multiplexer instead.
+void TinyCon::GamepadController::Init(int8_t hatOffset, std::array<int8_t, MaxNativeAdcPinCount> axisPins, std::array<int8_t, MaxNativeGpioPinCount> buttonPins, ActiveState activeState)
+{
+    // Input -1 is always the device itself with raw ADC and GPIO pins
+    Inputs[Inputs.size() - 1].Init(axisPins, buttonPins, activeState);
     for (std::size_t i = 0; i < Inputs.size() - 1; ++i) Inputs[i].Init(I2C0, i);
     for (std::size_t i = 0; i < Mpus.size(); ++i) Mpus[i].Init(I2C0, i);
     Haptics[1].Init(I2C0);
@@ -16,41 +19,41 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
     if constexpr (Tiny::GlobalLogThreshold >= Tiny::TILogLevel::Verbose)
     {
         LogI2C::Verbose("I2C0 Devices: ");
-    bool found = false;
+        bool found = false;
         for (auto addr = 0x02; addr < 0x78; ++addr)
-    {
-        I2C0.beginTransmission(addr);
-        if (I2C0.endTransmission() == 0)
         {
+            I2C0.beginTransmission(addr);
+            if (I2C0.endTransmission() == 0)
+            {
                 if (found) LogI2C::Verbose(", ");
-            found = true;
+                found = true;
                 LogI2C::Verbose("0x", addr, Tiny::TIFormat::Hex);
+            }
         }
-    }
 
         LogI2C::Verbose(Tiny::TIEndl);
         LogI2C::Verbose("I2C1 Devices: ");
-    found = false;
+        found = false;
         for (auto addr = 0x02; addr < 0x78; ++addr)
-    {
-        I2C1.beginTransmission(addr);
-        if (I2C1.endTransmission() == 0)
         {
+            I2C1.beginTransmission(addr);
+            if (I2C1.endTransmission() == 0)
+            {
                 if (found) LogI2C::Verbose(", ");
-            found = true;
+                found = true;
                 LogI2C::Verbose("0x", addr, Tiny::TIFormat::Hex);
             }
         }
         LogI2C::Verbose(Tiny::TIEndl);
     }
-#endif
 
     I2C0.setClock(1000000);
     LogGamepad::Info("Controller Update:");
     for (auto& mpu : Mpus)
-    {
-        [[maybe_unused]] auto time = millis();
-        Mpus[i].Update();
+        if (mpu.Enabled)
+        {
+            auto time = millis();
+            mpu.Update();
             LogGamepad::Debug("    MPU: (", mpu.Acceleration.X, ", ", mpu.Acceleration.Y, ", ", mpu.Acceleration.Z,
                               "), (", mpu.AngularVelocity.X, ", ", mpu.AngularVelocity.Y, ", ", mpu.AngularVelocity.Z,
                               "), (", mpu.Orientation.X, ", ", mpu.Orientation.Y, ", ", mpu.Orientation.Z,
@@ -58,15 +61,16 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
         }
 
     for (auto& input : Inputs)
-        Inputs[i].Update();
+        if (input.Present)
         {
             auto time = millis();
             LogGamepad::Debug("    Input: (");
             input.Update();
-        time = millis();
+            for (int8_t j = 0; j < input.GetAxisCount(); ++j)
             {
-        Haptics[i].Update(deltaTime);
+                if (j > 0) LogGamepad::Debug(", ");
                 LogGamepad::Debug(input.Axis[j]);
+            }
             LogGamepad::Debug("), (");
             for (int8_t j = 0; j < input.GetButtonCount(); ++j)
             {
@@ -74,10 +78,17 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
                 LogGamepad::Debug(input.Buttons[j] ? "Down" : "Up");
             }
             LogGamepad::Debug("), ", millis() - time, "ms", Tiny::TIEndl);
-    }
+        }
 
+    for (auto& haptic : Haptics)
+        if (haptic.Present && haptic.Enabled)
+        {
+            auto time = millis();
             LogGamepad::Debug("    Haptic: ", haptic.Available());
+            haptic.Update(deltaTime);
             LogGamepad::Debug(", ", millis() - time, "ms", Tiny::TIEndl);
+        }
+
     I2C0.setClock(400000);
 }
 
@@ -120,21 +131,25 @@ hid_gamepad_report_t TinyCon::GamepadController::MakeHidReport() const
 std::size_t TinyCon::GamepadController::MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
     auto size = 0;
-    for (auto& mpu : Mpus)
-        if (mpu.Present && mpu.Enabled)
-            size += mpu.FillBuffer(data);
+    for (auto& mpu : Mpus) if (mpu.Present && mpu.Enabled) size += mpu.FillBuffer(data);
     return size;
 }
 
 void TinyCon::GamepadController::AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data)
 {
-    uint8_t controller = data.Data[0];
-    uint8_t command = data.Data[1];
-    uint8_t count = data.Data[2];
-    const uint8_t* sequence = data.Data + 3;
-    uint16_t timeout = (data.Data[11] << 8) | data.Data[12];
-    Haptics[controller].Insert(command, count, sequence, timeout);
+    for (int8_t bit = 0; bit < 8; ++bit)
+        if ((data[0] & (1 << bit)) != 0)
+        {
+            uint8_t controller = bit;
+            uint8_t command = data[1];
+            uint8_t count = data[2];
+            const uint8_t* sequence = data.data() + 3;
+            uint16_t timeout = (data[11] << 8) | data[12];
+            Haptics[controller].Insert(command, count, sequence, timeout);
             LogGamepad::Info("Add Haptic Command: ", controller, ", ", command, ", ", count, ", ", timeout, Tiny::TIEndl);
+        }
+}
+
 float TinyCon::GamepadController::GetAxis(int8_t axisIndex) const
 {
     for (auto& input : Inputs)

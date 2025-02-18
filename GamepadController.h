@@ -20,7 +20,7 @@ namespace TinyCon
 class GamepadController
 {
 public:
-    static constexpr uint8_t Version = 1;
+        static constexpr uint16_t Version = 1;
         static constexpr uint8_t MaxInputControllers = 5;
         static constexpr uint8_t MaxMpuControllers = 2;
         static constexpr uint8_t MaxHapticControllers = 2;
@@ -34,51 +34,51 @@ public:
 #endif
         [[nodiscard]] std::size_t MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
 
-
-    [[nodiscard]] MpuTypes GetMpuType(int8_t index) const { return Mpus[index].GetType(); }
-    [[nodiscard]] HapticTypes GetHapticType(int8_t index) const { return Haptics[index].GetType(); }
-    [[nodiscard]] ControllerTypes GetControllerType(int8_t index) const { return Inputs[index].GetType(); }
-    [[nodiscard]] int8_t GetAxisCount(int8_t index) const { return Inputs[index].GetAxisCount(); }
+        [[nodiscard]] bool GetInputPresent(int8_t controller) const { return Inputs[controller].Present; }
+        [[nodiscard]] ControllerTypes GetControllerType(int8_t input) const { return Inputs[input].GetType(); }
+        [[nodiscard]] int16_t GetAxisCount(int8_t input) const { return Inputs[input].GetAxisCount(); }
+        [[nodiscard]] float GetAxis(int8_t controller, int8_t axisIndex)const  { return Inputs[controller].Axis[axisIndex]; }
+        [[nodiscard]] int16_t GetAxisCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetAxisCount(); return count; }
         [[nodiscard]] float GetAxis(int8_t axisIndex) const;
-    [[nodiscard]] int8_t GetAxisCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetAxisCount(); return count; }
-    [[nodiscard]] int8_t GetButtonCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetButtonCount(); return count; }
-
+        [[nodiscard]] int16_t GetButtonCount(int8_t input) const { return Inputs[input].GetButtonCount(); }
+        [[nodiscard]] bool GetButton(int8_t input, int8_t buttonIndex) const { return Inputs[input].Buttons[buttonIndex]; }
+        [[nodiscard]] int16_t GetButtonCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetButtonCount(); return count; }
         [[nodiscard]] bool GetButton(int8_t buttonIndex) const;
-    [[nodiscard]] bool GetControllerEnabled(int8_t index) const { return Inputs[index].Enabled; }
-    void SetControllerEnabled(int8_t index, bool enabled) { Inputs[index].Enabled = enabled; }
-    [[nodiscard]] bool GetAccelerationEnabled(int8_t index) const { return Mpus[index].AccelerationEnabled; }
-    void SetAccelerationEnabled(int8_t index, bool enabled) { Mpus[index].AccelerationEnabled = enabled; }
-    [[nodiscard]] bool GetAngularVelocityEnabled(int8_t index) const { return Mpus[index].AngularVelocityEnabled; }
-    void SetAngularVelocityEnabled(int8_t index, bool enabled) { Mpus[index].AngularVelocityEnabled = enabled; }
-    [[nodiscard]] bool GetOrientationEnabled(int8_t index) const { return Mpus[index].OrientationEnabled; }
-    void SetOrientationEnabled(int8_t index, bool enabled) { Mpus[index].OrientationEnabled = enabled; }
-    [[nodiscard]] bool GetTemperatureEnabled(int8_t index) const { return Mpus[index].TemperatureEnabled; }
-    void SetTemperatureEnabled(int8_t index, bool enabled) { Mpus[index].TemperatureEnabled = enabled; }
-    [[nodiscard]] bool GetInputEnabled(int8_t index) const { return Inputs[index].Enabled; }
-    void SetInputEnabled(int8_t index, bool enabled) { Inputs[index].Enabled = enabled; }
-    [[nodiscard]] bool GetHapticEnabled(int8_t index) const { return Haptics[index].Enabled; }
-    void SetHapticEnabled(int8_t index, bool enabled) { Haptics[index].Enabled = enabled; }
+        [[nodiscard]] bool GetUpdatedButton(int8_t controller, int8_t buttonIndex) { return Inputs[controller].GetUpdatedButton(buttonIndex); }
 
-    [[nodiscard]] AccelerometerRanges GetAccelerometerRange() const { return Mpus[0].GetAccelerometerRange(); }
-    void SetAccelerometerRange(AccelerometerRanges range) { for (auto& mpu : Mpus) mpu.SetAccelerometerRange(range); }
-    [[nodiscard]] GyroscopeRanges GetGyroscopeRange() const { return Mpus[0].GetGyroscopeRange(); }
-    void SetGyroscopeRange(GyroscopeRanges range) { for (auto& mpu : Mpus) mpu.SetGyroscopeRange(range); }
+        [[nodiscard]] bool GetAccelerationEnabled() const { return Mpus[0].AccelerationEnabled; }
+        void SetAccelerationEnabled(bool enabled) { for (auto& mpu : Mpus) mpu.AccelerationEnabled = enabled; }
+        [[nodiscard]] bool GetAngularVelocityEnabled() const { return Mpus[0].AngularVelocityEnabled; }
+        void SetAngularVelocityEnabled(bool enabled) { for (auto& mpu : Mpus) mpu.AngularVelocityEnabled = enabled; }
+        [[nodiscard]] bool GetOrientationEnabled() const { return Mpus[0].OrientationEnabled; }
+        void SetOrientationEnabled(bool enabled) { for (auto& mpu : Mpus) mpu.OrientationEnabled = enabled; }
+        [[nodiscard]] bool GetTemperatureEnabled() const { return Mpus[0].TemperatureEnabled; }
+        void SetTemperatureEnabled(bool enabled) { for (auto& mpu : Mpus) mpu.TemperatureEnabled = enabled; }
+        [[nodiscard]] int8_t GetMpuCount() const { int8_t count = 0; for (auto & Mpu : Mpus) if (Mpu.Present) ++count; return count; }
+        [[nodiscard]] bool GetMpuPresent(int8_t mpu) const { return Mpus[mpu].Present; }
+        [[nodiscard]] MpuTypes GetMpuType(int8_t mpu) const { return Mpus[mpu].GetType(); }
 
-    [[nodiscard]] HapticController::HapticCommands GetHapticCommand(int8_t controller, int8_t commandIndex) const { return Haptics[controller].GetHapticCommand(commandIndex); }
-    [[nodiscard]] uint8_t GetHapticCommandCount(int8_t controller, int8_t commandIndex) const { return Haptics[controller].GetHapticCommandCount(commandIndex); }
-    [[nodiscard]] uint8_t GetHapticCommandData(int8_t controller, int8_t commandIndex, int8_t offset) const { return Haptics[controller].GetHapticCommandData(commandIndex, offset); }
-    [[nodiscard]] uint16_t GetHapticCommandDuration(int8_t controller, int8_t commandIndex) const { return Haptics[controller].GetHapticCommandDuration(commandIndex); }
-    [[nodiscard]] uint8_t GetHapticQueueSize(int8_t controller) const { return Haptics[controller].GetHapticQueueSize(); }
-    void RemoveHapticCommand(int8_t controller, int8_t commandIndex) { Haptics[controller].RemoveHapticCommand(commandIndex); }
+        [[nodiscard]] AccelerometerRanges GetAccelerometerRange(int8_t mpu) const { return Mpus[mpu].GetAccelerometerRange(); }
+        void SetAccelerometerRange(int8_t mpu, AccelerometerRanges range) { Mpus[mpu].SetAccelerometerRange(range); }
+        [[nodiscard]] GyroscopeRanges GetGyroscopeRange(int8_t mpu) const { return Mpus[mpu].GetGyroscopeRange(); }
+        void SetGyroscopeRange(int8_t mpu, GyroscopeRanges range) { Mpus[mpu].SetGyroscopeRange(range); }
+
+        [[nodiscard]] Tiny::Math::TIVector3F GetAcceleration(int8_t mpu) const { return Mpus[mpu].Acceleration; }
+        [[nodiscard]] Tiny::Math::TIVector3F GetAngularVelocity(int8_t mpu) const { return Mpus[mpu].AngularVelocity; }
+        [[nodiscard]] Tiny::Math::TIVector3F GetOrientation(int8_t mpu) const { return Mpus[mpu].Orientation; }
+
+        [[nodiscard]] bool GetHapticEnabled(int8_t haptic) const { return Haptics[haptic].Enabled; }
+        void SetHapticEnabled(int8_t haptic, bool enabled) { Haptics[haptic].Enabled = enabled; }
+        [[nodiscard]] bool GetHapticPresent(int8_t haptic) const { return Haptics[haptic].Present; }
+        [[nodiscard]] HapticTypes GetHapticType(int8_t haptic) const { return Haptics[haptic].GetType(); }
+        [[nodiscard]] HapticController::HapticCommands GetHapticCommand(int8_t haptic, int8_t commandIndex) const { return Haptics[haptic].GetHapticCommand(commandIndex); }
+        [[nodiscard]] uint8_t GetHapticCommandCount(int8_t haptic, int8_t commandIndex) const { return Haptics[haptic].GetHapticCommandCount(commandIndex); }
+        [[nodiscard]] uint8_t GetHapticCommandData(int8_t haptic, int8_t commandIndex, int8_t offset) const { return Haptics[haptic].GetHapticCommandData(commandIndex, offset); }
+        [[nodiscard]] uint16_t GetHapticCommandDuration(int8_t haptic, int8_t commandIndex) const { return Haptics[haptic].GetHapticCommandDuration(commandIndex); }
+        [[nodiscard]] uint8_t GetHapticQueueSize(int8_t haptic) const { return Haptics[haptic].GetHapticQueueSize(); }
+        void RemoveHapticCommand(int8_t haptic, int8_t commandIndex) { Haptics[haptic].RemoveHapticCommand(commandIndex); }
     void ClearHapticCommands() { for (auto& haptic : Haptics) haptic.ClearHapticCommands(); }
         void AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data);
-
-    [[nodiscard]] float GetAxis(int8_t controller, int8_t axisIndex)const  { return Inputs[controller].GetAxis(axisIndex); }
-    [[nodiscard]] bool GetButton(int8_t controller, int8_t buttonIndex) const { return Inputs[controller].GetButton(buttonIndex); }
-    [[nodiscard]] bool GetUpdatedButton(int8_t controller, int8_t buttonIndex) { return Inputs[controller].GetUpdatedButton(buttonIndex); }
-    [[nodiscard]] Vector3 GetAcceleration(int8_t controller) const { return Mpus[controller].Acceleration; }
-    [[nodiscard]] Vector3 GetAngularVelocity(int8_t controller) const { return Mpus[controller].AngularVelocity; }
-    [[nodiscard]] Vector3 GetOrientation(int8_t controller) const { return Mpus[controller].Orientation; }
 
     uint8_t Id = 0;
 
@@ -88,5 +88,6 @@ private:
         std::array<HapticController, MaxHapticControllers> Haptics{};
         std::array<MpuController, MaxMpuControllers> Mpus{};
         std::array<InputController, MaxInputControllers> Inputs{};
+        int8_t HatOffset = -1;
 };
 }

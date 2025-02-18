@@ -5,6 +5,8 @@
 #include "Utilities.h"
 #include "GamepadController.h"
 
+#include <Core/Drivers/Input/TITinyConTypes.h>
+
 #include <cstdint>
 
 namespace TinyCon
@@ -14,11 +16,11 @@ class CommandProcessor
 public:
     explicit CommandProcessor(GamepadController& controller) : Controller(controller) {}
 
-    void ProcessCommand(Span command);
+    bool ProcessCommand(Tiny::Collections::TIFixedSpan<uint8_t> command);
 
     uint8_t LastCommand{};
-    uint8_t LastParameter{};
-    uint8_t LastCommandStatus{};
+    std::array<uint8_t, 2> LastParameter{};
+    Tiny::Drivers::Input::TITinyConCommandStatus LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
 
     [[nodiscard]] bool GetI2CEnabled() const { return I2CEnabled; }
     [[nodiscard]] bool GetBLEEnabled() const { return BLEEnabled; }
@@ -31,7 +33,7 @@ public:
 private:
     GamepadController& Controller;
     bool I2CEnabled = true;
-    bool USBEnabled = TINYCON_DEFAULT_USB_ENABLED;
-    bool BLEEnabled = TINYCON_DEFAULT_BLE_ENABLED;
+    bool USBEnabled = TinyConUSBEnabledByDefault;
+    bool BLEEnabled = TinyConBLEEnabledByDefault;
 };
 }

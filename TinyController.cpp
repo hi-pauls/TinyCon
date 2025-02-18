@@ -1,8 +1,10 @@
 #include "TinyController.h"
 
 using LogState = Tiny::TILogTarget<TinyCon::StateLogLevel>;
+
+void TinyCon::TinyController::Init(int8_t hatOffset, std::array<int8_t, MaxNativeAdcPinCount> axisPins, std::array<int8_t, MaxNativeGpioPinCount> buttonPins, ActiveState activeState)
 {
-    Controller.Init();
+    Controller.Init(hatOffset, axisPins, buttonPins, activeState);
     Power.Init();
 
 #if !NO_I2C_SLAVE

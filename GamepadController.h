@@ -17,22 +17,22 @@
 
 namespace TinyCon
 {
-class GamepadController
-{
-public:
+    class GamepadController
+    {
+    public:
         static constexpr uint16_t Version = 1;
         static constexpr uint16_t Magic = 0x5443;
         static constexpr uint8_t MaxInputControllers = 5;
         static constexpr uint8_t MaxMpuControllers = 2;
         static constexpr uint8_t MaxHapticControllers = 2;
 
-    GamepadController(TwoWire& i2c0, SoftWire& i2c1) : I2C0(i2c0), I2C1(i2c1) {}
+        GamepadController(TwoWire& i2c0, SoftWire& i2c1) : I2C0(i2c0), I2C1(i2c1) {}
 
-    void Init();
-    void Update(uint32_t deltaTime);
-#if !NO_BLE || !NO_USB
-    [[nodiscard]] hid_gamepad_report_t MakeHidReport() const;
-#endif
+        void Init(int8_t hatOffset = -1, std::array<int8_t, MaxNativeAdcPinCount> axisPins = {NC}, std::array<int8_t, MaxNativeGpioPinCount> buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
+        void Update(uint32_t deltaTime);
+    #if !NO_BLE || !NO_USB
+        [[nodiscard]] hid_gamepad_report_t MakeHidReport() const;
+    #endif
         [[nodiscard]] std::size_t MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
 
         [[nodiscard]] bool GetInputPresent(int8_t controller) const { return Inputs[controller].Present; }
@@ -78,17 +78,17 @@ public:
         [[nodiscard]] uint16_t GetHapticCommandDuration(int8_t haptic, int8_t commandIndex) const { return Haptics[haptic].GetHapticCommandDuration(commandIndex); }
         [[nodiscard]] uint8_t GetHapticQueueSize(int8_t haptic) const { return Haptics[haptic].GetHapticQueueSize(); }
         void RemoveHapticCommand(int8_t haptic, int8_t commandIndex) { Haptics[haptic].RemoveHapticCommand(commandIndex); }
-    void ClearHapticCommands() { for (auto& haptic : Haptics) haptic.ClearHapticCommands(); }
+        void ClearHapticCommands() { for (auto& haptic : Haptics) haptic.ClearHapticCommands(); }
         void AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data);
 
-    uint8_t Id = 0;
+        uint8_t Id = 0;
 
-private:
-    TwoWire& I2C0;
-    SoftWire& I2C1;
+    private:
+        TwoWire& I2C0;
+        SoftWire& I2C1;
         std::array<HapticController, MaxHapticControllers> Haptics{};
         std::array<MpuController, MaxMpuControllers> Mpus{};
         std::array<InputController, MaxInputControllers> Inputs{};
         int8_t HatOffset = -1;
-};
+    };
 }

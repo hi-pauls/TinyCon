@@ -72,24 +72,86 @@ void TinyCon::PinsInputController::Init(const std::array<int8_t, MaxNativeAdcPin
     AxisPins = axisPins;
     ButtonPins = buttonPins;
 }
+
+
+void TinyCon::InputController::Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState)
+{
+    Pins.Init(axisPins, buttonPins, activeState);
+    if (Pins.Present)
+    {
+        Type = ControllerTypes::Pins;
+        Present = true;
+    }
+    else Present = false;
+}
+
+void TinyCon::InputController::Init(TwoWire& i2c, int8_t controller)
 {
     if (controller < 4) Seesaw.Init(i2c, controller);
-    Present = Seesaw.Present;
+    if (Seesaw.Present)
+    {
+        Type = ControllerTypes::Seesaw;
+        Present = Seesaw.Present;
+    }
+    else Present = false;
 }
 
 void TinyCon::InputController::Update()
 {
     int8_t axisIndex = 0;
     int8_t buttonIndex = 0;
-    if (Seesaw.Present)
+    switch (Type)
     {
-        Seesaw.Update();
-        for (float axis : Seesaw.Axis) Axis[axisIndex++] = axis;
-        for (auto & button : Seesaw.Buttons) Buttons[buttonIndex++] = button.Get();
+        case ControllerTypes::Pins:
+            Pins.Update();
+            for (float axis : Pins.Axis) Axis[axisIndex++] = axis;
+            for (auto & button : Pins.Buttons) Buttons[buttonIndex++] = button.Get();
+            break;
+        case ControllerTypes::Seesaw:
+            Seesaw.Update();
+            for (float axis : Seesaw.Axis) Axis[axisIndex++] = axis;
+            for (auto & button : Seesaw.Buttons) Buttons[buttonIndex++] = button.Get();
+            break;
+        default: break;
     }
 }
 
 bool TinyCon::InputController::GetUpdatedButton(int8_t index)
 {
-    return Seesaw.Present && Seesaw.GetUpdatedButton(index);
+    switch (Type)
+    {
+        case ControllerTypes::Pins: return Pins.GetUpdatedButton(index);
+        case ControllerTypes::Seesaw: return Seesaw.GetUpdatedButton(index);
+        default: return false;
+    }
+}
+
+TinyCon::ControllerTypes TinyCon::InputController::GetType() const
+{
+    switch (Type)
+    {
+        case ControllerTypes::Pins: return Pins.Present ? ControllerTypes::Pins : ControllerTypes::None;
+        case ControllerTypes::Seesaw: return Seesaw.Present ? ControllerTypes::Seesaw : ControllerTypes::None;
+        default: return ControllerTypes::None;
+    }
+}
+
+int16_t TinyCon::InputController::GetAxisCount() const
+{
+    switch (Type)
+    {
+        case ControllerTypes::Pins: return Pins.GetAxisCount();
+        case ControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Axis) / sizeof(Seesaw.Axis[0]): 0;
+        default: return 0;
+    }
+}
+
+int16_t TinyCon::InputController::GetButtonCount() const
+{
+    switch (Type)
+    {
+        case ControllerTypes::Pins: return Pins.GetButtonCount();
+        case ControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Buttons) / sizeof(Seesaw.Buttons[0]): 0;
+        default: return 0;
+    }
 }

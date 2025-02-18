@@ -7,6 +7,10 @@ namespace TinyCon
     constexpr const char *TinyConVersion = "0.1";
     constexpr bool TinyConUSBEnabledByDefault = true;
     constexpr bool TinyConBLEEnabledByDefault = true;
+
+    constexpr int MaxNativeAdcPinCount = 6;
+    // 8 if using all 6 axis, 14 if we use all the axis pins for buttons
+    constexpr int MaxNativeGpioPinCount = 14;
     constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;

@@ -21,6 +21,9 @@ class GamepadController
 {
 public:
     static constexpr uint8_t Version = 1;
+        static constexpr uint8_t MaxInputControllers = 5;
+        static constexpr uint8_t MaxMpuControllers = 2;
+        static constexpr uint8_t MaxHapticControllers = 2;
 
     GamepadController(TwoWire& i2c0, SoftWire& i2c1) : I2C0(i2c0), I2C1(i2c1) {}
 
@@ -77,14 +80,13 @@ public:
     [[nodiscard]] Vector3 GetAngularVelocity(int8_t controller) const { return Mpus[controller].AngularVelocity; }
     [[nodiscard]] Vector3 GetOrientation(int8_t controller) const { return Mpus[controller].Orientation; }
 
-    static constexpr uint8_t MaxControllers = 2;
     uint8_t Id = 0;
 
 private:
     TwoWire& I2C0;
     SoftWire& I2C1;
-    HapticController Haptics[MaxControllers];
-    MpuController Mpus[MaxControllers];
-    InputController Inputs[MaxControllers];
+        std::array<HapticController, MaxHapticControllers> Haptics{};
+        std::array<MpuController, MaxMpuControllers> Mpus{};
+        std::array<InputController, MaxInputControllers> Inputs{};
 };
 }

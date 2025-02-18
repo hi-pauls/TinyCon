@@ -4,14 +4,11 @@ using LogGamepad = Tiny::TILogTarget<TinyCon::GamepadLogLevel>;
 using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
 
     // more, might be worth using an I2C multiplexer instead.
+    for (std::size_t i = 0; i < Inputs.size() - 1; ++i) Inputs[i].Init(I2C0, i);
+    for (std::size_t i = 0; i < Mpus.size(); ++i) Mpus[i].Init(I2C0, i);
     Haptics[1].Init(I2C0);
     Haptics[0].Init(I2C1);
-
-    for (auto i = 0; i < MaxControllers; ++i)
-    {
-        Mpus[i].Init(I2C0, i);
-        Inputs[i].Init(I2C0, i);
-    }
+    HatOffset = hatOffset;
 }
 
 void TinyCon::GamepadController::Update(uint32_t deltaTime)
@@ -50,7 +47,7 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
 
     I2C0.setClock(1000000);
     LogGamepad::Info("Controller Update:");
-    for (int8_t i = 0; i < MaxControllers; ++i)
+    for (auto& mpu : Mpus)
     {
         [[maybe_unused]] auto time = millis();
         Mpus[i].Update();

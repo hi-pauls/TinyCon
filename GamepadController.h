@@ -29,8 +29,8 @@ public:
 #if !NO_BLE || !NO_USB
     [[nodiscard]] hid_gamepad_report_t MakeHidReport() const;
 #endif
-    [[nodiscard]] std::size_t MakeMpuBuffer(Span data) const;
-    void AddHapticCommand(Span data);
+        [[nodiscard]] std::size_t MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
+
 
     [[nodiscard]] MpuTypes GetMpuType(int8_t index) const { return Mpus[index].GetType(); }
     [[nodiscard]] HapticTypes GetHapticType(int8_t index) const { return Haptics[index].GetType(); }
@@ -68,6 +68,7 @@ public:
     [[nodiscard]] uint8_t GetHapticQueueSize(int8_t controller) const { return Haptics[controller].GetHapticQueueSize(); }
     void RemoveHapticCommand(int8_t controller, int8_t commandIndex) { Haptics[controller].RemoveHapticCommand(commandIndex); }
     void ClearHapticCommands() { for (auto& haptic : Haptics) haptic.ClearHapticCommands(); }
+        void AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data);
 
     [[nodiscard]] float GetAxis(int8_t controller, int8_t axisIndex)const  { return Inputs[controller].GetAxis(axisIndex); }
     [[nodiscard]] bool GetButton(int8_t controller, int8_t buttonIndex) const { return Inputs[controller].GetButton(buttonIndex); }

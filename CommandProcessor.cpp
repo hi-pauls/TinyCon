@@ -2,11 +2,11 @@
 
 bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<uint8_t> command)
 {
-    LastCommand = command.Data[0];
-    LastParameter = command.Data[1];
-    LastCommandStatus = 0;
+    LastCommand = command[0];
+    LastParameter[0] = command[1];
+    LastParameter[1] = command[2];
 
-    switch (Command(command.Data[0]))
+    switch (Tiny::Drivers::Input::TITinyConCommand(command[0]))
     {
         case Commands::ID:
             Controller.Id = command.Data[1];

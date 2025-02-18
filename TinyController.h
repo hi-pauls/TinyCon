@@ -30,7 +30,7 @@ public:
     void Init();
     void Update(int32_t deltaTime);
 
-    void AddHapticCommand(Span data) { Controller.AddHapticCommand(data); }
+        void AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data) { Controller.AddHapticCommand(data); }
 
     [[nodiscard]] bool IsSuspended() const { return Suspended; }
 

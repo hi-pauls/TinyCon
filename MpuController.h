@@ -44,7 +44,7 @@ class MpuController
 public:
     void Init(TwoWire& i2c, int8_t controller);
     void Update();
-    [[nodiscard]] std::size_t FillBuffer(Span data) const;
+        [[nodiscard]] std::size_t FillBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
 
     [[nodiscard]] MpuTypes GetType() const { return (Icm20948Present && Enabled) ? MpuTypes::ICM20948 : MpuTypes::None; }
     [[nodiscard]] AccelerometerRanges GetAccelerometerRange() const { return AccelerationRange; }

@@ -20,7 +20,7 @@ namespace TinyCon
 class IndicatorController
 {
 public:
-    enum class LedEffects : int8_t { Off = 0, On = 1, Pulse = 2, Fade = 3 };
+        enum class LedEffects : int8_t { Off = 0, On = 1, Pulse = 2, Fade = 3, Fixed = 4 };
 
     IndicatorController(TwoWire& masterI2c, const GamepadController& controller, const PowerController& power)
         : Controller(controller), Power(power)

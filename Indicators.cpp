@@ -162,20 +162,20 @@ void TinyCon::IndicatorController::UpdateLed(uint32_t deltaTime, uint8_t& value,
     switch (current)
     {
         case LedEffects::Off:
-            value = 0;
             if (next != LedEffects::Off)
             {
                 current = next;
                 time = 2000;
             }
+            else value = 0;
             break;
         case LedEffects::On:
-            value = 127;
             if (next != LedEffects::On)
             {
                 current = next;
                 time = 2000;
             }
+            else value = 127;
             break;
         case LedEffects::Pulse:
             if (next != LedEffects::Pulse)
@@ -206,6 +206,14 @@ void TinyCon::IndicatorController::UpdateLed(uint32_t deltaTime, uint8_t& value,
             else if (time < 0) time = 2000;
             else if (time < 1000) value = time >> 3;
             else value = 127 - ((time - 1000) >> 3);
+            break;
+        case LedEffects::Fixed:
+            if (next != LedEffects::Fixed)
+            {
+                current = next;
+                time = 2000;
+            }
+
             break;
     }
 }

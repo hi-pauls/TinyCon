@@ -4,6 +4,8 @@
 
 #include "Utilities.h"
 
+#include "Core/Math/TIVector.h"
+
 #include <Arduino.h>
 #include <Adafruit_ICM20948.h>
 
@@ -59,9 +61,9 @@ public:
     bool OrientationEnabled = true;
     bool TemperatureEnabled = true;
 
-    Vector3 Acceleration = {};
-    Vector3 AngularVelocity = {};
-    Vector3 Orientation = {};
+        Tiny::Math::TIVector3F Acceleration = {};
+        Tiny::Math::TIVector3F AngularVelocity = {};
+        Tiny::Math::TIVector3F Orientation = {};
     uint16_t Temperature = 0;
 
 private:

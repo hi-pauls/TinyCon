@@ -17,7 +17,7 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
     {
         LogI2C::Verbose("I2C0 Devices: ");
     bool found = false;
-    for (auto addr = 0x02; addr < 0x70; ++addr)
+        for (auto addr = 0x02; addr < 0x78; ++addr)
     {
         I2C0.beginTransmission(addr);
         if (I2C0.endTransmission() == 0)
@@ -31,7 +31,7 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
         LogI2C::Verbose(Tiny::TIEndl);
         LogI2C::Verbose("I2C1 Devices: ");
     found = false;
-    for (auto addr = 0x08; addr < 0x70; ++addr)
+        for (auto addr = 0x02; addr < 0x78; ++addr)
     {
         I2C1.beginTransmission(addr);
         if (I2C1.endTransmission() == 0)

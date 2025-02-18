@@ -15,7 +15,7 @@ void TinyCon::BluetoothController::Init()
     Bluefruit.setName(TINYCON_PRODUCT);
 
     Discovery.setManufacturer(TINYCON_VENDOR);
-    Discovery.setSoftwareRev(TINYCON_VERSION);
+    Discovery.setSoftwareRev(TinyConVersion);
     Discovery.begin();
 
     GamepadService.begin();

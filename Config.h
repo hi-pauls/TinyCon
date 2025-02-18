@@ -4,6 +4,9 @@
 
 namespace TinyCon
 {
+    constexpr const char *TinyConVersion = "0.1";
+    constexpr bool TinyConUSBEnabledByDefault = true;
+    constexpr bool TinyConBLEEnabledByDefault = true;
     constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;
@@ -26,9 +29,6 @@ namespace TinyCon
 #ifndef LED_RED
 #define LED_RED -1
 #endif
-
-#define TINYCON_DEFAULT_USB_ENABLED true
-#define TINYCON_DEFAULT_BLE_ENABLED true
 
 #define USE_OLED 1
 #define USE_LC709203 0

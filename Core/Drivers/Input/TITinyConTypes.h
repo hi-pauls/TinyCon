@@ -19,8 +19,8 @@ namespace Tiny::Drivers::Input
         ID = 0x1,
         /** Version of the controller */
         Version = 0x2,
-        /** Magic number for the controller, 2 bytes, 0x5443 or TC read-only */
-        Magic = 0x4,
+        /** VIN voltage, 2 bytes, half float, read-only */
+        VinVoltage = 0x4,
         /** Battery charge percentage, 2 bytes, half float, read-only */
         BatteryPercentage = 0x6,
         /** Battery voltage, 2 bytes, half float, read-only */
@@ -107,6 +107,9 @@ namespace Tiny::Drivers::Input
          */
         FeatureEnable = 0x3F,
 
+        /** Magic number for the controller, 2 bytes, 0x5443 or TC read-only */
+        Magic = 0x40,
+
         /**
          * The controller data, containing all enabled MPUs before all buttons before all axis. If any of these are not
          * present, they will be skipped. A current full read will be 20 * 2 MPU bytes + 1 * 2 button bytes + 2 * 2 * 2 axis
@@ -123,7 +126,7 @@ namespace Tiny::Drivers::Input
          *     Buttons 0-32 byte in boolean array format with up to 256 buttons
          *     Axis 0-64 * 2 byte in half-float format
          */
-        Data = 0x40
+        Data = 0x42
     };
 
     constexpr TITinyConCommands TITinyConCommand(uint8_t command) { return static_cast<TITinyConCommands>(command); }

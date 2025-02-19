@@ -187,6 +187,7 @@ void TinyCon::I2CController::Update()
             value = 0;
         }
     }
+    if (Controller.GetButtonCount() & 7) SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, value);
 
     for (auto i = 0; i < Controller.GetAxisCount(); ++i)
     {

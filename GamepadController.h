@@ -28,7 +28,7 @@ namespace TinyCon
 
         GamepadController(TwoWire& i2c0, SoftWire& i2c1) : I2C0(i2c0), I2C1(i2c1) {}
 
-        void Init(int8_t hatOffset = -1, std::array<int8_t, MaxNativeAdcPinCount> axisPins = {NC}, std::array<int8_t, MaxNativeGpioPinCount> buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
+        void Init(int8_t hatOffset = -1, const std::array<int8_t, MaxNativeAdcPinCount>& axisPins = {NC}, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
         void Update(uint32_t deltaTime);
     #if !NO_BLE || !NO_USB
         [[nodiscard]] hid_gamepad_report_t MakeHidReport() const;

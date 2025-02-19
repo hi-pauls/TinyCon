@@ -3,7 +3,7 @@
 using LogGamepad = Tiny::TILogTarget<TinyCon::GamepadLogLevel>;
 using LogI2C = Tiny::TILogTarget<TinyCon::I2CLogLevel>;
 
-void TinyCon::GamepadController::Init(int8_t hatOffset, std::array<int8_t, MaxNativeAdcPinCount> axisPins, std::array<int8_t, MaxNativeGpioPinCount> buttonPins, ActiveState activeState)
+void TinyCon::GamepadController::Init(int8_t hatOffset, const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState)
 {
     // Input -1 is always the device itself with raw ADC and GPIO pins
     Inputs[Inputs.size() - 1].Init(axisPins, buttonPins, activeState);

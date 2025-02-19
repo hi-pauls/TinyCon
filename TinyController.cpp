@@ -2,7 +2,7 @@
 
 using LogState = Tiny::TILogTarget<TinyCon::StateLogLevel>;
 
-void TinyCon::TinyController::Init(int8_t hatOffset, std::array<int8_t, MaxNativeAdcPinCount> axisPins, std::array<int8_t, MaxNativeGpioPinCount> buttonPins, ActiveState activeState)
+void TinyCon::TinyController::Init(int8_t hatOffset, const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState)
 {
     Controller.Init(hatOffset, axisPins, buttonPins, activeState);
     Power.Init();

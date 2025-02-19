@@ -27,7 +27,7 @@ namespace TinyCon
               USBControl(Controller, Processor), Bluetooth(Controller, Processor),
               Indicators(masterI2C0, Controller, Power), I2C(slaveI2C, Controller, Power, Processor) {}
 
-        void Init(int8_t hatOffset = -1, std::array<int8_t, MaxNativeAdcPinCount> axisPins = {NC}, std::array<int8_t, MaxNativeGpioPinCount> buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
+        void Init(int8_t hatOffset = -1, const std::array<int8_t, MaxNativeAdcPinCount>& axisPins = {NC}, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
         void Update(int32_t deltaTime);
 
         void AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data) { Controller.AddHapticCommand(data); }

@@ -41,16 +41,16 @@ std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<ui
     auto* current = const_cast<uint8_t*>(data.data());
     if (AccelerationEnabled)
     {
-        FillHalf(current , Acceleration.X);
-        FillHalf(current , Acceleration.Y);
-        FillHalf(current , Acceleration.Z);
+        FillHalf(current, Acceleration.X);
+        FillHalf(current, Acceleration.Y);
+        FillHalf(current, Acceleration.Z);
         size += 6;
     }
     if (AngularVelocityEnabled)
     {
         FillHalf(current , AngularVelocity.X);
-        FillHalf(current , AngularVelocity.Y);
-        FillHalf(current , AngularVelocity.Z);
+        FillHalf(current, AngularVelocity.Y);
+        FillHalf(current, AngularVelocity.Z);
         size += 6;
     }
     if (OrientationEnabled)
@@ -62,7 +62,7 @@ std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<ui
     }
     if (TemperatureEnabled)
     {
-        *current ++ = Temperature >> 8;
+        *current++ = Temperature >> 8;
         *current  = Temperature & 0xFF;
         size += 2;
     }

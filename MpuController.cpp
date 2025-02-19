@@ -37,9 +37,8 @@ void TinyCon::MpuController::Update()
 
 std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
-    auto size = 1;
+    auto size = 0;
     auto* current = const_cast<uint8_t*>(data.data());
-    *current ++ = AccelerationEnabled << 5 | AngularVelocityEnabled << 4 | OrientationEnabled << 3 | TemperatureEnabled << 2;
     if (AccelerationEnabled)
     {
         FillHalf(current , Acceleration.X);

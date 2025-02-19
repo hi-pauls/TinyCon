@@ -66,7 +66,7 @@ namespace TinyCon
         template <typename TArray>
         static constexpr int16_t CountNotNC(const TArray& pins)
         {
-            for (int16_t count = 0; count < pins.size(); ++count) if (pins[count] == NC) return count;
+            for (std::size_t count = 0; count < pins.size(); ++count) if (pins[count] == NC) return static_cast<int16_t>(count);
             return pins.size();
         }
     public:

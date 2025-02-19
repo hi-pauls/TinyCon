@@ -66,9 +66,8 @@ namespace TinyCon
         template <typename TArray>
         static constexpr int16_t CountNotNC(const TArray& pins)
         {
-            int16_t count = 0;
-            for (auto pin : pins) if (pin != NC) ++count;
-            return count;
+            for (int16_t count = 0; count < pins.size(); ++count) if (pins[count] == NC) return count;
+            return pins.size();
         }
     public:
         void Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState);

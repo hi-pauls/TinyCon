@@ -105,6 +105,17 @@ you need support for additional hardware.
  - If none of the above, we use watchdog sleep to save power and check for the select button
    to be down long enough (10s) to restart Bluetooth.
 
+## Raw data reading
+
+Most of the config data can be read without help, use this to read float16 values using a temporary python shell:
+
+```python
+import numpy as np
+def floatv(v):
+    return np.frombuffer(bytes([v & 0xff, v >> 8]), dtype=np.float16)[0]
+floatv(0x3c00)
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

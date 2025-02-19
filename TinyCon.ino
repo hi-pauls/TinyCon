@@ -109,6 +109,8 @@ void loop()
     }
 }
 
-#if USE_ARDUINO_IDE
+#ifndef HI_MAKEFILE_BUILDSYSTEM
+// Indicates that we are building with the Arduino IDE or some similar build system, that may not
+// be linking against the standard C++ library, which is required for the std::function to work.
 void std::__throw_bad_function_call() { Serial.println("Bad function call"); while (true) {} }
 #endif

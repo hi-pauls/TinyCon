@@ -165,17 +165,14 @@ void TinyCon::I2CController::Update()
     for (int8_t i = 0; i < GamepadController::MaxHapticControllers; ++i)
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::HapticTypes, i, HapticTypeId(Controller.GetHapticType(i)));
     for (int8_t i = 0; i < GamepadController::MaxInputControllers; ++i)
-        SetRegister(Tiny::Drivers::Input::TITinyConCommands::ControllerTypes, i,
-                    ControllerTypeId(Controller.GetControllerType(i)));
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::ControllerTypes, i, ControllerTypeId(Controller.GetControllerType(i)));
+    for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuTypes, i, MpuTypeId(Controller.GetMpuType(i)));
 
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::AxisCount, Controller.GetAxisCount());
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::ButtonCount, Controller.GetButtonCount());
-    auto dataOffset = Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::Data);
-    for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
-    {
-        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuTypes, i, MpuTypeId(Controller.GetMpuType(i)));
-        if (Controller.GetMpuPresent(i)) dataOffset += Controller.MakeMpuBuffer({Registers.data() + dataOffset, 20});
-    }
+    constexpr auto dataStart = Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::Data);
+    auto dataOffset = Controller.MakeMpuBuffer({Registers.data() + dataStart, Registers.size() - dataStart});
 
     uint8_t value = 0;
     for (int8_t i = 0; i < Controller.GetButtonCount(); ++i)

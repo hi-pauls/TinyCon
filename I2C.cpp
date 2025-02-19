@@ -148,6 +148,9 @@ void TinyCon::I2CController::Receive()
 
 void TinyCon::I2CController::Update()
 {
+    uint16_t vinVoltage = Tiny::Math::HalfFromFloat(Power.USBPowerVoltage);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::VinVoltage, 0, vinVoltage >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::VinVoltage, 1, vinVoltage & 0xFF);
     uint16_t batteryPercentage = Tiny::Math::HalfFromFloat(Power.Battery.Percentage);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryPercentage, 0, batteryPercentage >> 8);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::BatteryPercentage, 1, batteryPercentage & 0xFF);

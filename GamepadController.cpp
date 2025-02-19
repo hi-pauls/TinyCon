@@ -50,15 +50,14 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
     I2C0.setClock(1000000);
     LogGamepad::Info("Controller Update:");
     for (auto& mpu : Mpus)
-        if (mpu.Enabled)
-        {
-            auto time = millis();
-            mpu.Update();
-            LogGamepad::Debug("    MPU: (", mpu.Acceleration.X, ", ", mpu.Acceleration.Y, ", ", mpu.Acceleration.Z,
-                              "), (", mpu.AngularVelocity.X, ", ", mpu.AngularVelocity.Y, ", ", mpu.AngularVelocity.Z,
-                              "), (", mpu.Orientation.X, ", ", mpu.Orientation.Y, ", ", mpu.Orientation.Z,
-                              "), ", mpu.Temperature, ", ", millis() - time, "ms", Tiny::TIEndl);
-        }
+    {
+        auto time = millis();
+        mpu.Update();
+        LogGamepad::Debug("    MPU: (", mpu.Acceleration.X, ", ", mpu.Acceleration.Y, ", ", mpu.Acceleration.Z,
+                          "), (", mpu.AngularVelocity.X, ", ", mpu.AngularVelocity.Y, ", ", mpu.AngularVelocity.Z,
+                          "), (", mpu.Orientation.X, ", ", mpu.Orientation.Y, ", ", mpu.Orientation.Z,
+                          "), ", mpu.Temperature, ", ", millis() - time, "ms", Tiny::TIEndl);
+    }
 
     for (auto& input : Inputs)
         if (input.Present)
@@ -131,7 +130,7 @@ hid_gamepad_report_t TinyCon::GamepadController::MakeHidReport() const
 std::size_t TinyCon::GamepadController::MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
     auto size = 0;
-    for (auto& mpu : Mpus) if (mpu.Present && mpu.Enabled) size += mpu.FillBuffer(data);
+    for (auto& mpu : Mpus) if (mpu.Present) size += mpu.FillBuffer(data);
     return size;
 }
 

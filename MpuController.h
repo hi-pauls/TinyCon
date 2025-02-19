@@ -48,13 +48,12 @@ namespace TinyCon
         void Update();
         [[nodiscard]] std::size_t FillBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
 
-        [[nodiscard]] MpuTypes GetType() const { return (Icm20948Present && Enabled) ? MpuTypes::ICM20948 : MpuTypes::None; }
+        [[nodiscard]] MpuTypes GetType() const { return (Icm20948Present) ? MpuTypes::ICM20948 : MpuTypes::None; }
         [[nodiscard]] AccelerometerRanges GetAccelerometerRange() const { return AccelerationRange; }
         void SetAccelerometerRange(AccelerometerRanges range);
         [[nodiscard]] GyroscopeRanges GetGyroscopeRange() const { return GyroscopeRange; }
         void SetGyroscopeRange(GyroscopeRanges range);
 
-        bool Enabled = true;
         bool Present = false;
         bool AccelerationEnabled = true;
         bool AngularVelocityEnabled = true;

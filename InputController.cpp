@@ -79,7 +79,7 @@ void TinyCon::InputController::Init(const std::array<int8_t, MaxNativeAdcPinCoun
     Pins.Init(axisPins, buttonPins, activeState);
     if (Pins.Present)
     {
-        Type = ControllerTypes::Pins;
+        Type = Tiny::Drivers::Input::TITinyConControllerTypes::Pins;
         Present = true;
     }
     else Present = false;
@@ -90,7 +90,7 @@ void TinyCon::InputController::Init(TwoWire& i2c, int8_t controller)
     if (controller < 4) Seesaw.Init(i2c, controller);
     if (Seesaw.Present)
     {
-        Type = ControllerTypes::Seesaw;
+        Type = Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw;
         Present = Seesaw.Present;
     }
     else Present = false;
@@ -102,12 +102,12 @@ void TinyCon::InputController::Update()
     int8_t buttonIndex = 0;
     switch (Type)
     {
-        case ControllerTypes::Pins:
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Pins:
             Pins.Update();
             for (float axis : Pins.Axis) Axis[axisIndex++] = axis;
             for (auto & button : Pins.Buttons) Buttons[buttonIndex++] = button.Get();
             break;
-        case ControllerTypes::Seesaw:
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw:
             Seesaw.Update();
             for (float axis : Seesaw.Axis) Axis[axisIndex++] = axis;
             for (auto & button : Seesaw.Buttons) Buttons[buttonIndex++] = button.Get();
@@ -120,19 +120,19 @@ bool TinyCon::InputController::GetUpdatedButton(int8_t index)
 {
     switch (Type)
     {
-        case ControllerTypes::Pins: return Pins.GetUpdatedButton(index);
-        case ControllerTypes::Seesaw: return Seesaw.GetUpdatedButton(index);
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Pins: return Pins.GetUpdatedButton(index);
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw: return Seesaw.GetUpdatedButton(index);
         default: return false;
     }
 }
 
-TinyCon::ControllerTypes TinyCon::InputController::GetType() const
+Tiny::Drivers::Input::TITinyConControllerTypes TinyCon::InputController::GetType() const
 {
     switch (Type)
     {
-        case ControllerTypes::Pins: return Pins.Present ? ControllerTypes::Pins : ControllerTypes::None;
-        case ControllerTypes::Seesaw: return Seesaw.Present ? ControllerTypes::Seesaw : ControllerTypes::None;
-        default: return ControllerTypes::None;
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Pins: return Pins.Present ? Tiny::Drivers::Input::TITinyConControllerTypes::Pins : Tiny::Drivers::Input::TITinyConControllerTypes::None;
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw: return Seesaw.Present ? Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw : Tiny::Drivers::Input::TITinyConControllerTypes::None;
+        default: return Tiny::Drivers::Input::TITinyConControllerTypes::None;
     }
 }
 
@@ -140,8 +140,8 @@ int16_t TinyCon::InputController::GetAxisCount() const
 {
     switch (Type)
     {
-        case ControllerTypes::Pins: return Pins.GetAxisCount();
-        case ControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Axis) / sizeof(Seesaw.Axis[0]): 0;
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Pins: return Pins.GetAxisCount();
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Axis) / sizeof(Seesaw.Axis[0]): 0;
         default: return 0;
     }
 }
@@ -150,8 +150,8 @@ int16_t TinyCon::InputController::GetButtonCount() const
 {
     switch (Type)
     {
-        case ControllerTypes::Pins: return Pins.GetButtonCount();
-        case ControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Buttons) / sizeof(Seesaw.Buttons[0]): 0;
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Pins: return Pins.GetButtonCount();
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw: return Seesaw.Present ? sizeof(Seesaw.Buttons) / sizeof(Seesaw.Buttons[0]): 0;
         default: return 0;
     }
 }

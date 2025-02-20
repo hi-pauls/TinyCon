@@ -7,7 +7,7 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
     LastParameter[1] = command[2];
     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidCommand;
 
-    switch (Tiny::Drivers::Input::TITinyConCommand(command[0]))
+    switch (Tiny::Drivers::Input::TITinyConCommands(command[0]))
     {
         case Tiny::Drivers::Input::TITinyConCommands::ID:
             if (command.size() >= 2)
@@ -73,11 +73,11 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
         case Tiny::Drivers::Input::TITinyConCommands::MpuConfig6:
             if (command.size() >= 2)
             {
-                int8_t offset = command[0] - Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::MpuConfig1);
+                int8_t offset = command[0] - static_cast<uint8_t>(Tiny::Drivers::Input::TITinyConCommands::MpuConfig1);
                 if (offset >= 0 && offset < GamepadController::MaxMpuControllers)
                 {
-                    Controller.SetAccelerometerRange(offset, AccelerometerRange(command[1] >> 4));
-                    Controller.SetGyroscopeRange(offset, GyroscopeRange(command[1] & 0xF));
+                    Controller.SetAccelerometerRange(offset, Tiny::Drivers::Input::TITinyConAccelerometerRanges(command[1] >> 4));
+                    Controller.SetGyroscopeRange(offset, Tiny::Drivers::Input::TITinyConGyroscopeRanges(command[1] & 0xF));
                     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::Ok;
                     return true;
                 }

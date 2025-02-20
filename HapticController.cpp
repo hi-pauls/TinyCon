@@ -152,7 +152,7 @@ void TinyCon::HapticController::Init(SoftWire& wire)
 
 void TinyCon::HapticController::Insert(uint8_t command, uint8_t count, const uint8_t* data, uint16_t duration)
 {
-    Commands[Head].Command = static_cast<HapticCommands>(command);
+    Commands[Head].Command = Tiny::Drivers::Input::TITinyConHapticCommands(command);
     Commands[Head].Count = count;
     std::memcpy(Commands[Head].Value, data, count);
     if (count < 8) Commands[Head].Value[count] = 0;
@@ -180,10 +180,10 @@ void TinyCon::HapticController::Update(int32_t deltaTime)
         const auto& command = Commands[Tail];
         switch (command.Command)
         {
-            case HapticCommands::PlayWaveform:
+            case Tiny::Drivers::Input::TITinyConHapticCommands::PlayWaveform:
                 DRV2605.PlayWaveform(&command.Value[0]);
                 break;
-            case HapticCommands::PlayRealtime:
+            case Tiny::Drivers::Input::TITinyConHapticCommands::PlayRealtime:
                 DRV2605.PlayRealtime(command.Value[RealtimeIndex]);
                 break;
             default:
@@ -198,8 +198,8 @@ bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
     if (Tail == Head) { LogHaptic::Info(", Finished"); return false; }
 
     auto& command = Commands[Tail];
-    LogHaptic::Info(", Command: ", HapticCommandId(command.Command), ", Duration: ", command.Duration);
-    if (command.Command == HapticCommands::PlayRealtime)
+    LogHaptic::Info(", Command: ", Tiny::Drivers::Input::TITinyConHapticCommands(command.Command), ", Duration: ", command.Duration);
+    if (command.Command == Tiny::Drivers::Input::TITinyConHapticCommands::PlayRealtime)
     {
         if (RealtimeTimeLeft < deltaTime)
         {
@@ -242,7 +242,7 @@ bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
 void TinyCon::HapticController::RemoveHapticCommand(int8_t index)
 {
     index = GetCommandIndex(index);
-    Commands[index].Command = HapticCommands::Noop;
+    Commands[index].Command = Tiny::Drivers::Input::TITinyConHapticCommands::Noop;
     Commands[index].Count = 0;
     Commands[index].Duration = 0;
 }

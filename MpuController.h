@@ -3,6 +3,7 @@
 #include "Config.h"
 #include "Utilities.h"
 
+#include "Core/Drivers/Input/TITinyConTypes.h"
 #include "Core/Math/TIVector.h"
 #include "Core/Utilities/Collections/TISpan.h"
 
@@ -11,36 +12,6 @@
 
 namespace TinyCon
 {
-    enum class MpuTypes : uint8_t
-    {
-        None = 0,
-        ICM20948
-    };
-    constexpr uint8_t MpuTypeId(MpuTypes type) { return static_cast<uint8_t>(type); }
-
-    enum class AccelerometerRanges : uint8_t
-    {
-        Invalid = 0,
-        G2,
-        G4,
-        G8,
-        G16
-    };
-    constexpr uint8_t AccelerometerRangeId(AccelerometerRanges range) { return static_cast<uint8_t>(range); }
-    constexpr AccelerometerRanges AccelerometerRange(uint8_t range) { return static_cast<AccelerometerRanges>(range); }
-
-    enum class GyroscopeRanges : uint8_t
-    {
-        Invalid = 0,
-        D250,
-        D500,
-        D1000,
-        D2000,
-        D4000
-    };
-    constexpr uint8_t GyroscopeRangeId(GyroscopeRanges range) { return static_cast<uint8_t>(range); }
-    constexpr GyroscopeRanges GyroscopeRange(uint8_t range) { return static_cast<GyroscopeRanges>(range); }
-
     class MpuController
     {
     public:
@@ -48,11 +19,11 @@ namespace TinyCon
         void Update();
         [[nodiscard]] std::size_t FillBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const;
 
-        [[nodiscard]] MpuTypes GetType() const { return (Icm20948Present) ? MpuTypes::ICM20948 : MpuTypes::None; }
-        [[nodiscard]] AccelerometerRanges GetAccelerometerRange() const { return AccelerationRange; }
-        void SetAccelerometerRange(AccelerometerRanges range);
-        [[nodiscard]] GyroscopeRanges GetGyroscopeRange() const { return GyroscopeRange; }
-        void SetGyroscopeRange(GyroscopeRanges range);
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConMpuTypes GetType() const { return (Icm20948Present) ? Tiny::Drivers::Input::TITinyConMpuTypes::ICM20948 : Tiny::Drivers::Input::TITinyConMpuTypes::None; }
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConAccelerometerRanges GetAccelerometerRange() const { return AccelerationRange; }
+        void SetAccelerometerRange(Tiny::Drivers::Input::TITinyConAccelerometerRanges range);
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConGyroscopeRanges GetGyroscopeRange() const { return GyroscopeRange; }
+        void SetGyroscopeRange(Tiny::Drivers::Input::TITinyConGyroscopeRanges range);
 
         bool Present = false;
         bool AccelerationEnabled = true;
@@ -63,7 +34,7 @@ namespace TinyCon
         Tiny::Math::TIVector3F Acceleration = {};
         Tiny::Math::TIVector3F AngularVelocity = {};
         Tiny::Math::TIVector3F Orientation = {};
-        uint16_t Temperature = 0;
+        float Temperature = 0;
 
     private:
         static constexpr int8_t ICM20948AddressByController[] = {0x68, 0x69};
@@ -72,7 +43,7 @@ namespace TinyCon
         int8_t Controller;
         bool Icm20948Present = false;
         Adafruit_ICM20948 Icm20948;
-        AccelerometerRanges AccelerationRange = AccelerometerRanges::G16;
-        GyroscopeRanges GyroscopeRange = GyroscopeRanges::D2000;
+        Tiny::Drivers::Input::TITinyConAccelerometerRanges AccelerationRange = Tiny::Drivers::Input::TITinyConAccelerometerRanges::G16;
+        Tiny::Drivers::Input::TITinyConGyroscopeRanges GyroscopeRange = Tiny::Drivers::Input::TITinyConGyroscopeRanges::D2000;
     };
 }

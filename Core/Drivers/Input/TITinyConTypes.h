@@ -129,8 +129,7 @@ namespace Tiny::Drivers::Input
         Data = 0x42
     };
 
-    constexpr TITinyConCommands TITinyConCommand(uint8_t command) { return static_cast<TITinyConCommands>(command); }
-    constexpr uint8_t TITinyConCommandId(TITinyConCommands command) { return static_cast<uint8_t>(command); }
+    static constexpr uint16_t TITinyConMagic = 0x5443;
 
     enum class TITinyConCommandStatus : uint8_t
     {
@@ -144,7 +143,51 @@ namespace Tiny::Drivers::Input
         WarningUnknownHapticController
     };
 
-    static constexpr uint8_t TITinyConCommandStatusId(TITinyConCommandStatus status) { return static_cast<uint8_t>(status); }
     static constexpr bool IsOk(TITinyConCommandStatus status) { return status == TITinyConCommandStatus::Ok; }
     static constexpr bool IsError(TITinyConCommandStatus status) { return status > TITinyConCommandStatus::Ok && status < TITinyConCommandStatus::WarningUnknownHapticController; }
+
+    enum class TITinyConMpuTypes : uint8_t
+    {
+        None = 0,
+        ICM20948
+    };
+
+    enum class TITinyConAccelerometerRanges : uint8_t
+    {
+        Invalid = 0,
+        G2,
+        G4,
+        G8,
+        G16
+    };
+
+    enum class TITinyConGyroscopeRanges : uint8_t
+    {
+        Invalid = 0,
+        D250,
+        D500,
+        D1000,
+        D2000,
+        D4000
+    };
+
+    enum class TITinyConHapticTypes : uint8_t
+    {
+        None = 0,
+        DRV2605
+    };
+
+    enum class TITinyConHapticCommands
+    {
+        Noop = 0,
+        PlayWaveform = 0x1,
+        PlayRealtime = 0x2
+    };
+
+    enum class TITinyConControllerTypes : uint8_t
+    {
+        None = 0,
+        Seesaw,
+        Pins
+    };
 }

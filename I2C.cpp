@@ -31,8 +31,8 @@ void TinyCon::I2CController::Init()
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::ID, Controller.Id);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 0, GamepadController::Version >> 8);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 1, GamepadController::Version & 0xFF);
-    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 0, GamepadController::Magic >> 8);
-    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 1, GamepadController::Magic & 0xFF);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 0, Tiny::Drivers::Input::TITinyConMagic >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 1, Tiny::Drivers::Input::TITinyConMagic & 0xFF);
 
     // Initialize the configurable registers with the default settings
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::MPUDataEnable,
@@ -43,7 +43,7 @@ void TinyCon::I2CController::Init()
 
     for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuConfig1, i,
-                    AccelerometerRangeId(Controller.GetAccelerometerRange(i)) << 4 | GyroscopeRangeId(Controller.GetGyroscopeRange(i)));
+                    static_cast<uint8_t>(Controller.GetAccelerometerRange(i)) << 4 | static_cast<uint8_t>(Controller.GetGyroscopeRange(i)));
 
     // Initialize the dynamic data
     Update();
@@ -79,7 +79,7 @@ void TinyCon::I2CController::Receive()
     // At least one byte must be received.
     Buffer[BufferIndex++] = SlaveI2C.read();
     RegisterAddress = Buffer[0];
-    switch (Tiny::Drivers::Input::TITinyConCommand(Buffer[0]))
+    switch (Tiny::Drivers::Input::TITinyConCommands(Buffer[0]))
     {
         // Handle writable commands, these can only reset the buffer index if complete
         // or timed out, only then can we also update the register address
@@ -113,7 +113,7 @@ void TinyCon::I2CController::Receive()
             {
                 int8_t controller = Buffer[1];
                 int8_t queueIndex = Buffer[2];
-                Registers[RegisterAddress] = HapticController::HapticCommandId(Controller.GetHapticCommand(controller, queueIndex));
+                Registers[RegisterAddress] = static_cast<uint8_t>(Controller.GetHapticCommand(controller, queueIndex));
                 Registers[RegisterAddress + 1] = Controller.GetHapticCommandCount(controller, queueIndex);
                 for (int8_t i = 0; i < 8; ++i) Registers[RegisterAddress + 2 + i] = Controller.GetHapticCommandData(controller, queueIndex, i);
                 Registers[RegisterAddress + 10] = Controller.GetHapticCommandDuration(controller, queueIndex) >> 8;
@@ -143,7 +143,7 @@ void TinyCon::I2CController::Receive()
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 0, Processor.LastCommand);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 1, Processor.LastParameter[0]);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 2, Processor.LastParameter[1]);
-    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 3, Tiny::Drivers::Input::TITinyConCommandStatusId(Processor.LastCommandStatus));
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::LastCommand, 3, static_cast<uint8_t>(Processor.LastCommandStatus));
 }
 
 void TinyCon::I2CController::Update()
@@ -163,15 +163,15 @@ void TinyCon::I2CController::Update()
 
     // Because devices may be detected any time, we need to update the types registers every time with the data
     for (int8_t i = 0; i < GamepadController::MaxHapticControllers; ++i)
-        SetRegister(Tiny::Drivers::Input::TITinyConCommands::HapticTypes, i, HapticTypeId(Controller.GetHapticType(i)));
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::HapticTypes, i, static_cast<uint8_t>(Controller.GetHapticType(i)));
     for (int8_t i = 0; i < GamepadController::MaxInputControllers; ++i)
-        SetRegister(Tiny::Drivers::Input::TITinyConCommands::ControllerTypes, i, ControllerTypeId(Controller.GetControllerType(i)));
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::ControllerTypes, i, static_cast<uint8_t>(Controller.GetControllerType(i)));
     for (int8_t i = 0; i < GamepadController::MaxMpuControllers; ++i)
-        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuTypes, i, MpuTypeId(Controller.GetMpuType(i)));
+        SetRegister(Tiny::Drivers::Input::TITinyConCommands::MpuTypes, i, static_cast<uint8_t>(Controller.GetMpuType(i)));
 
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::AxisCount, Controller.GetAxisCount());
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::ButtonCount, Controller.GetButtonCount());
-    constexpr auto dataStart = Tiny::Drivers::Input::TITinyConCommandId(Tiny::Drivers::Input::TITinyConCommands::Data);
+    constexpr auto dataStart = static_cast<uint8_t>(Tiny::Drivers::Input::TITinyConCommands::Data);
     auto dataOffset = Controller.MakeMpuBuffer({Registers.data() + dataStart, Registers.size() - dataStart});
 
     uint8_t value = 0;

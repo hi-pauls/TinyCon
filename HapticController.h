@@ -3,6 +3,7 @@
 #include "Config.h"
 
 #include "Utilities.h"
+#include "Core/Drivers/Input/TITinyConTypes.h"
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -10,14 +11,6 @@
 
 namespace TinyCon
 {
-    enum class HapticTypes : uint8_t
-    {
-        None = 0,
-        DRV2605
-    };
-
-    constexpr uint8_t HapticTypeId(HapticTypes type) { return static_cast<uint8_t>(type); }
-
     class DRV2605Controller
     {
     public:
@@ -45,14 +38,6 @@ namespace TinyCon
     public:
         static constexpr int8_t MaxCommandCount = 8;
 
-        enum class HapticCommands
-        {
-            Noop = 0,
-            PlayWaveform = 0x1,
-            PlayRealtime = 0x2
-        };
-        static constexpr uint8_t HapticCommandId(HapticCommands command) { return static_cast<uint8_t>(command); }
-
         void Init(TwoWire& wire);
         void Init(SoftWire& wire);
         void Insert(uint8_t command, uint8_t count, const uint8_t* data, uint16_t duration);
@@ -60,8 +45,8 @@ namespace TinyCon
 
         [[nodiscard]] bool HasValues() const { return Tail != Head; }
         [[nodiscard]] int8_t Available() const { return (Head + MaxCommandCount - Tail) & (MaxCommandCount - 1); }
-        [[nodiscard]] HapticTypes GetType() const { return (DRV2605.Present && Enabled) ? HapticTypes::DRV2605 : HapticTypes::None; }
-        [[nodiscard]] HapticCommands GetHapticCommand(int8_t index) const { return Commands[GetCommandIndex(index)].Command; }
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConHapticTypes GetType() const { return (DRV2605.Present && Enabled) ? Tiny::Drivers::Input::TITinyConHapticTypes::DRV2605 : Tiny::Drivers::Input::TITinyConHapticTypes::None; }
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConHapticCommands GetHapticCommand(int8_t index) const { return Commands[GetCommandIndex(index)].Command; }
         [[nodiscard]] uint8_t GetHapticCommandCount(int8_t index) const { return Commands[GetCommandIndex(index)].Count; }
         [[nodiscard]] uint8_t GetHapticCommandData(int8_t index, int8_t offset) const { return Commands[GetCommandIndex(index)].Value[offset]; }
         [[nodiscard]] uint16_t GetHapticCommandDuration(int8_t index) const { return Commands[GetCommandIndex(index)].Duration; }
@@ -77,7 +62,7 @@ namespace TinyCon
 
         struct
         {
-            HapticCommands Command = HapticCommands::Noop;
+            Tiny::Drivers::Input::TITinyConHapticCommands Command = Tiny::Drivers::Input::TITinyConHapticCommands::Noop;
             uint8_t Count = 0;
             uint8_t Value[8] = {};
             uint16_t Duration = 0;

@@ -62,39 +62,38 @@ std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<ui
     }
     if (TemperatureEnabled)
     {
-        *current++ = Temperature >> 8;
-        *current  = Temperature & 0xFF;
+        FillHalf(current , Temperature);
         size += 2;
     }
 
     return size;
 }
 
-void TinyCon::MpuController::SetAccelerometerRange(AccelerometerRanges range)
+void TinyCon::MpuController::SetAccelerometerRange(Tiny::Drivers::Input::TITinyConAccelerometerRanges range)
 {
     AccelerationRange = range;
     if (Icm20948Present)
     {
         switch (range)
         {
-            case AccelerometerRanges::G2: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_2_G); break;
-            case AccelerometerRanges::G4: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_4_G); break;
-            case AccelerometerRanges::G8: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_8_G); break;
+            case Tiny::Drivers::Input::TITinyConAccelerometerRanges::G2: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_2_G); break;
+            case Tiny::Drivers::Input::TITinyConAccelerometerRanges::G4: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_4_G); break;
+            case Tiny::Drivers::Input::TITinyConAccelerometerRanges::G8: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_8_G); break;
             default: Icm20948.setAccelRange(ICM20948_ACCEL_RANGE_16_G); break;
         }
     }
 }
 
-void TinyCon::MpuController::SetGyroscopeRange(GyroscopeRanges range)
+void TinyCon::MpuController::SetGyroscopeRange(Tiny::Drivers::Input::TITinyConGyroscopeRanges range)
 {
     GyroscopeRange = range;
     if (Icm20948Present)
     {
         switch (range)
         {
-            case GyroscopeRanges::D250: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_250_DPS); break;
-            case GyroscopeRanges::D500: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_500_DPS); break;
-            case GyroscopeRanges::D1000: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_1000_DPS); break;
+            case Tiny::Drivers::Input::TITinyConGyroscopeRanges::D250: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_250_DPS); break;
+            case Tiny::Drivers::Input::TITinyConGyroscopeRanges::D500: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_500_DPS); break;
+            case Tiny::Drivers::Input::TITinyConGyroscopeRanges::D1000: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_1000_DPS); break;
             default: Icm20948.setGyroRange(ICM20948_GYRO_RANGE_2000_DPS); break;
         }
     }

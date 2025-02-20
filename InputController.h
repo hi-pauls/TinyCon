@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Config.h"
-
 #include "Utilities.h"
+
+#include "Core/Drivers/Input/TITinyConTypes.h"
 
 #include <Arduino.h>
 #include <Adafruit_seesaw.h>
@@ -10,14 +11,6 @@
 
 namespace TinyCon
 {
-    enum class ControllerTypes : uint8_t
-    {
-        None = 0,
-        Seesaw,
-        Pins
-    };
-    constexpr uint8_t ControllerTypeId(ControllerTypes type) { return static_cast<uint8_t>(type); }
-
     struct DebouncedButton
     {
         bool History[4] = {};
@@ -94,12 +87,12 @@ namespace TinyCon
     {
     public:
         InputController() {};
-        ~InputController() { if (Type == ControllerTypes::Seesaw) Seesaw.~SeesawController(); }
+        ~InputController() { if (Type == Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw) Seesaw.~SeesawController(); }
 
         void Init(TwoWire& i2c, int8_t controller);
         void Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState);
         void Update();
-        [[nodiscard]] ControllerTypes GetType() const;
+        [[nodiscard]] Tiny::Drivers::Input::TITinyConControllerTypes GetType() const;
         [[nodiscard]] int16_t GetAxisCount() const;
         [[nodiscard]] int16_t GetButtonCount() const;
 
@@ -113,7 +106,7 @@ namespace TinyCon
         bool Buttons[32] = {};
 
     private:
-        ControllerTypes Type = ControllerTypes::None;
+        Tiny::Drivers::Input::TITinyConControllerTypes Type = Tiny::Drivers::Input::TITinyConControllerTypes::None;
         union
         {
             PinsInputController Pins;

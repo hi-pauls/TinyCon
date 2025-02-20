@@ -49,7 +49,7 @@ namespace TinyCon
         std::array<uint8_t, MaxI2CRegisters> Registers = {};
         void SetRegister(Tiny::Drivers::Input::TITinyConCommands command, uint8_t offset, uint8_t value)
         {
-            Registers[Tiny::Drivers::Input::TITinyConCommandId(command) + offset] = value;
+            Registers[static_cast<uint8_t>(command) + offset] = value;
         }
 
         void SetRegister(Tiny::Drivers::Input::TITinyConCommands command, uint8_t value) { SetRegister(command, 0, value); }

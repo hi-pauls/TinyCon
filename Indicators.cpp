@@ -45,7 +45,7 @@ void TinyCon::IndicatorController::UpdateDisplay(char mode)
         SSD1306.clearDisplay();
 
         auto axisCount = Controller.GetAxisCount();
-        auto axisHeight = DisplayHeight / axisCount;
+        auto axisHeight = axisCount > 0 ? DisplayHeight / axisCount : 0;
         auto buttonWidth = DisplayHeight;
         auto buttonHeight = DisplayHeight;
         auto buttonCount = Controller.GetButtonCount();
@@ -81,7 +81,7 @@ void TinyCon::IndicatorController::UpdateDisplay(char mode)
         }
 
         auto mpuCount = Controller.GetMpuCount();
-        auto mpuHeight = DisplayHeight / mpuCount;
+        auto mpuHeight = mpuCount > 0 ? DisplayHeight / mpuCount : 0;
         for (int8_t mpuY = 0, mpuIndex = 0; mpuIndex < GamepadController::MaxMpuControllers; mpuY += mpuHeight, ++mpuIndex)
         {
             for (;!Controller.GetMpuPresent(mpuIndex) && mpuIndex < GamepadController::MaxMpuControllers; mpuIndex++);

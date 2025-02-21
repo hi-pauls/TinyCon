@@ -29,8 +29,8 @@ void TinyCon::I2CController::Init()
 
     // Set the read-only registers with static data and initialize the others with the defaults
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::ID, Controller.Id);
-    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 0, GamepadController::Version >> 8);
-    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 1, GamepadController::Version & 0xFF);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 0, Tiny::Drivers::Input::TITinyConVersion >> 8);
+    SetRegister(Tiny::Drivers::Input::TITinyConCommands::Version, 1, Tiny::Drivers::Input::TITinyConVersion & 0xFF);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 0, Tiny::Drivers::Input::TITinyConMagic >> 8);
     SetRegister(Tiny::Drivers::Input::TITinyConCommands::Magic, 1, Tiny::Drivers::Input::TITinyConMagic & 0xFF);
 

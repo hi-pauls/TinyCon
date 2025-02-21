@@ -20,7 +20,6 @@ namespace TinyCon
     class GamepadController
     {
     public:
-        static constexpr uint16_t Version = 1;
         static constexpr uint8_t MaxInputControllers = 5;
         static constexpr uint8_t MaxMpuControllers = 2;
         static constexpr uint8_t MaxHapticControllers = 2;

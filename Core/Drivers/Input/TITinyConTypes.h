@@ -129,6 +129,7 @@ namespace Tiny::Drivers::Input
         Data = 0x42
     };
 
+    static constexpr uint16_t TITinyConVersion = 1;
     static constexpr uint16_t TITinyConMagic = 0x5443;
 
     enum class TITinyConCommandStatus : uint8_t

@@ -17,7 +17,7 @@ namespace Tiny
 
     constexpr TILogLevel GlobalLogThreshold = TILogLevel::Debug;
 
-    struct TIEndlType { static constexpr const char* Value = "\n"; };
+    struct TIEndlType { static constexpr const char* Value = "\n\r"; };
     constexpr TIEndlType TIEndl = TIEndlType();
     template <typename ...TValues> inline void LogFunc(TValues... values) { Serial.print(values...); }
     template <> inline void LogFunc<TIEndlType>(TIEndlType) { LogFunc(TIEndlType::Value); }

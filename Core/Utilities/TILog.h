@@ -21,7 +21,7 @@ namespace Tiny
     constexpr TIEndlType TIEndl = TIEndlType();
     template <typename ...TValues> inline void LogFunc(TValues... values) { Serial.print(values...); }
     template <> inline void LogFunc<TIEndlType>(TIEndlType) { LogFunc(TIEndlType::Value); }
-    enum class TIFormat : uint8_t { Hex = HEX, Dec = DEC, Bin = BIN, Oct = OCT };
+     enum class TIFormat : uint8_t { Hex = HEX, Dec = DEC, Bin = BIN, Oct = OCT };
 
     template <TILogLevel CDefaultLevel>
     struct TILogTarget
@@ -37,12 +37,12 @@ namespace Tiny
         template <TILogLevel CLogLevel, typename TValue>
         static void Log(TValue value)
         {
-            if constexpr (GlobalLogThreshold <= CDefaultLevel && GlobalLogThreshold <= CLogLevel) LogFunc(value);
+            if constexpr (CLogLevel <= CDefaultLevel && CLogLevel <= GlobalLogThreshold) LogFunc(value);
         }
         template<TILogLevel CLogLevel, typename TValue>
         static void Log(TValue value, TIFormat format)
         {
-            if constexpr (GlobalLogThreshold <= CDefaultLevel && GlobalLogThreshold <= CLogLevel) LogFunc(value, static_cast<int>(format));
+            if constexpr (CLogLevel <= CDefaultLevel && CLogLevel <= GlobalLogThreshold) LogFunc(value, static_cast<int>(format));
         }
         template <TILogLevel CLogLevel, typename TValue, typename ...TValues>
         static void Log(TValue value, TValues... values)

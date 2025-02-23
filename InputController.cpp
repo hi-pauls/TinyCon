@@ -23,25 +23,23 @@ void TinyCon::SeesawController::Init()
 
 void TinyCon::SeesawController::Update()
 {
-    if (!Present) return;
-
-    // Get latest input values
-    auto buttonStates = Device.digitalReadBulk(InputButtonMask);
-    if (buttonStates == 0)
+    if (!Present)
     {
+        if ((Present = Device.begin(AddressByController[Controller]))) Init();
+    }
+    else if (auto buttonStates = Device.digitalReadBulk(InputButtonMask))
+    {
+        for (auto i = 0; i < InputButtonCount; ++i)
+            Buttons[i].AddState((buttonStates & InputButtons[i]) == 0);
+        for (auto i = 0; i < InputAxisCount; ++i)
+            Axis[i] = Tiny::Math::Min(Tiny::Math::Max(Device.analogRead(InputAxis[i]) / 512.0f - 1.0f, -1.0f), 1.0f);
+    }
+    else
         // This is relevant for Seesaw inputs we connect via Stemma QT, since they may still have a reset button.
         // This will result in the input register being all 0's, looking like all buttons are pressed at the same
         // time. Try to reinitialize the device, causing a software reset in the process. Discard the input after,
         // so we don't get random results because of the cached button states.
-        Device.SWReset();
-        Init();
-        return;
-    }
-
-    for (auto i = 0; i < InputButtonCount; ++i)
-        Buttons[i].AddState((buttonStates & InputButtons[i]) == 0);
-    for (auto i = 0; i < InputAxisCount; ++i)
-        Axis[i] = Device.analogRead(InputAxis[i]) / 512.0f - 1.0f;
+        Present = false;
 }
 
 bool TinyCon::SeesawController::GetUpdatedButton(int8_t index)

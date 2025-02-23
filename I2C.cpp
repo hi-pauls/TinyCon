@@ -193,4 +193,6 @@ void TinyCon::I2CController::Update()
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis >> 8);
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis & 0xFF);
     }
+
+    for (; dataOffset < Registers.size(); ++dataOffset) Registers[dataStart + dataOffset] = dataStart + dataOffset;
 }

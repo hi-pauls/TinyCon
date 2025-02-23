@@ -8,7 +8,13 @@ void TinyCon::GamepadController::Init(int8_t hatOffset, const std::array<int8_t,
     // Input -1 is always the device itself with raw ADC and GPIO pins
     Inputs[Inputs.size() - 1].Init(axisPins, buttonPins, activeState);
     for (std::size_t i = 0; i < Inputs.size() - 1; ++i) Inputs[i].Init(I2C0, i);
-    for (std::size_t i = 0; i < Mpus.size(); ++i) Mpus[i].Init(I2C0, i);
+    auto anyMpuInitialized = false;
+    for (std::size_t i = 0; i < Mpus.size(); ++i)
+    {
+        Mpus[i].Init(I2C0, i);
+        if (!anyMpuInitialized) Mpus[i].Update();
+        anyMpuInitialized |= Mpus[i].Present;
+    }
     Haptics[1].Init(I2C0);
     Haptics[0].Init(I2C1);
     HatOffset = hatOffset;
@@ -47,18 +53,22 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
         LogI2C::Verbose(Tiny::TIEndl);
     }
 
-    I2C0.setClock(1000000);
+    I2C0.setClock(400000);
     LogGamepad::Info("Controller Update:");
+    auto mpuInitialized = false;
     for (auto& mpu : Mpus)
     {
         auto time = millis();
-        mpu.Update();
+        auto mpuWasPresent = mpu.Present;
+        if (!mpuInitialized || mpu.Present) mpu.Update();
+        if (!mpuWasPresent && mpu.Present) mpuInitialized = true;
         LogGamepad::Debug("    MPU: (", mpu.Acceleration.X, ", ", mpu.Acceleration.Y, ", ", mpu.Acceleration.Z,
                           "), (", mpu.AngularVelocity.X, ", ", mpu.AngularVelocity.Y, ", ", mpu.AngularVelocity.Z,
                           "), (", mpu.Orientation.X, ", ", mpu.Orientation.Y, ", ", mpu.Orientation.Z,
                           "), ", mpu.Temperature, ", ", millis() - time, "ms", Tiny::TIEndl);
     }
 
+    I2C0.setClock(800000);
     for (auto& input : Inputs)
         if (input.Present)
         {
@@ -79,6 +89,7 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
             LogGamepad::Debug("), ", millis() - time, "ms", Tiny::TIEndl);
         }
 
+    I2C0.setClock(400000);
     for (auto& haptic : Haptics)
         if (haptic.Present && haptic.Enabled)
         {
@@ -87,8 +98,6 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
             haptic.Update(deltaTime);
             LogGamepad::Debug(", ", millis() - time, "ms", Tiny::TIEndl);
         }
-
-    I2C0.setClock(400000);
 }
 
 #if !NO_BLE || !NO_USB
@@ -130,7 +139,8 @@ hid_gamepad_report_t TinyCon::GamepadController::MakeHidReport() const
 std::size_t TinyCon::GamepadController::MakeMpuBuffer(Tiny::Collections::TIFixedSpan<uint8_t> data) const
 {
     auto size = 0;
-    for (auto& mpu : Mpus) if (mpu.Present) size += mpu.FillBuffer(data);
+    for (auto& mpu : Mpus) if (mpu.Present)
+        size += mpu.FillBuffer({data.data() + size, data.size()});
     return size;
 }
 

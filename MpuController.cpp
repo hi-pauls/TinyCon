@@ -16,10 +16,12 @@ void TinyCon::MpuController::Update()
             I2C->beginTransmission(address);
             if (I2C->endTransmission() == 0 && (Icm20948Present = Icm20948.begin_I2C(address, I2C)))
             {
+                delay(100);
                 SetAccelerometerRange(AccelerationRange);
                 SetGyroscopeRange(GyroscopeRange);
                 Icm20948.setMagDataRate(AK09916_MAG_DATARATE_50_HZ);
                 Present = true;
+                delay(10);
             }
         }
     }
@@ -48,7 +50,7 @@ std::size_t TinyCon::MpuController::FillBuffer(Tiny::Collections::TIFixedSpan<ui
     }
     if (AngularVelocityEnabled)
     {
-        FillHalf(current , AngularVelocity.X);
+        FillHalf(current, AngularVelocity.X);
         FillHalf(current, AngularVelocity.Y);
         FillHalf(current, AngularVelocity.Z);
         size += 6;

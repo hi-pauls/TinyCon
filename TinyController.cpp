@@ -25,7 +25,7 @@ void TinyCon::TinyController::Init(int8_t hatOffset, const std::array<int8_t, Ma
 
 void TinyCon::TinyController::Update(int32_t deltaTime)
 {
-    bool i2cNeedsUpdate = Power.PowerSource == PowerSources::I2C;
+    bool i2cNeedsUpdate = Power.PowerSource == PowerSources::I2C || (!Processor.GetUSBEnabled() && !Processor.GetBLEEnabled());
     bool bluetoothWasConnected = Bluetooth.IsConnected();
     bool bluetoothNeedsUpdate = !i2cNeedsUpdate && Bluetooth.IsActive();
     bool usbNeedsUpdate = !i2cNeedsUpdate && !Bluetooth.IsConnected() && USBControl.IsActive();

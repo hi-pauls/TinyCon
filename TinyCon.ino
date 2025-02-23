@@ -86,7 +86,7 @@ void setup()
 #endif
 
     Controller.Init(5);
-    Watchdog.enable(1000);
+    Watchdog.enable(2000);
 }
 
 constexpr auto UpdateFrequency = 1000 / 100;

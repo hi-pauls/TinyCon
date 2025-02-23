@@ -1,5 +1,7 @@
 #include "CommandProcessor.h"
 
+using LogCommand = Tiny::TILogTarget<TinyCon::CommandLogLevel>;
+
 bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<uint8_t> command)
 {
     LastCommand = command[0];
@@ -24,6 +26,7 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
                 if (command[2] > 8)
                 {
                     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticDataSize;
+                    LogCommand::Error("Invalid Haptic Data Size: ", command[2], Tiny::TIEndl);
                     return false;
                 }
 
@@ -33,6 +36,7 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
                     {
                         // We'll still execute the command, but we'll return an error
                         LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::WarningUnknownHapticController;
+                        LogCommand::Warning("Unknown Haptic Controller: ", bit, Tiny::TIEndl);
                     }
 
                 Controller.AddHapticCommand(command);
@@ -46,12 +50,14 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
                 if (command[1] >= GamepadController::MaxHapticControllers)
                 {
                     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticController;
+                    LogCommand::Error("Invalid Haptic Controller: ", command[1], Tiny::TIEndl);
                     return false;
                 }
 
                 if (command[2] >= 8)
                 {
                     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidHapticDataIndex;
+                    LogCommand::Error("Invalid Haptic Data Index: ", command[2], Tiny::TIEndl);
                     return false;
                 }
 
@@ -84,6 +90,7 @@ bool TinyCon::CommandProcessor::ProcessCommand(Tiny::Collections::TIFixedSpan<ui
                 else
                 {
                     LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorInvalidMpuIndex;
+                    LogCommand::Error("Invalid MPU Index: ", offset, Tiny::TIEndl);
                     return false;
                 }
             }

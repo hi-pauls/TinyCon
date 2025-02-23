@@ -54,7 +54,7 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
     }
 
     I2C0.setClock(400000);
-    LogGamepad::Info("Controller Update:");
+    LogGamepad::Info("Controller Update:", Tiny::TIEndl);
     auto mpuInitialized = false;
     for (auto& mpu : Mpus)
     {
@@ -94,9 +94,10 @@ void TinyCon::GamepadController::Update(uint32_t deltaTime)
         if (haptic.Present && haptic.Enabled)
         {
             auto time = millis();
-            LogGamepad::Debug("    Haptic: ", haptic.Available());
+            LogGamepad::Debug("    Haptic: ", haptic.Available(), " ");
             haptic.Update(deltaTime);
-            LogGamepad::Debug(", ", millis() - time, "ms", Tiny::TIEndl);
+            LogGamepad::Debug(", ", millis() - time, "ms");
+            LogGamepad::Info(Tiny::TIEndl);
         }
 }
 

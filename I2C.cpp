@@ -71,7 +71,13 @@ void TinyCon::I2CController::Receive()
 {
     // Handle timeout first, if we haven't received data for CommandTimeout us, reset
     auto time = micros();
-    if (time - LastInputTime > Timeout) BufferIndex = 0;
+    if (time - LastInputTime > Timeout && BufferIndex > 0)
+    {
+        LogI2C::Info("I2C Timeout: ", BufferIndex, Tiny::TIEndl);
+        Processor.LastCommandStatus = Tiny::Drivers::Input::TITinyConCommandStatus::ErrorTimeout;
+        BufferIndex = 0;
+    }
+
     LastInputTime = time;
 
     if (!SlaveI2C.available()) return;

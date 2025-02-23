@@ -166,6 +166,7 @@ void TinyCon::HapticController::Insert(uint8_t command, uint8_t count, const uin
 
 void TinyCon::HapticController::Update(int32_t deltaTime)
 {
+    LogHaptic::Info("Haptic");
     if (!Present && Enabled)
     {
         LogHaptic::Info(", Trying Init");
@@ -198,7 +199,7 @@ bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
     if (Tail == Head) { LogHaptic::Info(", Finished"); return false; }
 
     auto& command = Commands[Tail];
-    LogHaptic::Info(", Command: ", Tiny::Drivers::Input::TITinyConHapticCommands(command.Command), ", Duration: ", command.Duration);
+    LogHaptic::Info(", Command: ", static_cast<uint8_t>(command.Command), ", Duration: ", command.Duration);
     if (command.Command == Tiny::Drivers::Input::TITinyConHapticCommands::PlayRealtime)
     {
         if (RealtimeTimeLeft < deltaTime)

@@ -135,6 +135,7 @@ namespace Tiny::Drivers::Input
     enum class TITinyConCommandStatus : uint8_t
     {
         Ok = 0,
+        ErrorTimeout,
         ErrorInvalidCommand,
         ErrorIncompleteCommand,
         ErrorInvalidMpuIndex,

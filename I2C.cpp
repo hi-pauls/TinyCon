@@ -189,6 +189,7 @@ void TinyCon::I2CController::Update()
     for (auto i = 0; i < Controller.GetAxisCount(); ++i)
     {
         auto axis = Tiny::Math::HalfFromFloat(Controller.GetAxis(i));
+        if ((axis >= 0x7c00 && axis < 0x8000) || (axis >= 0xfc00)) axis = 0x0000;
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis >> 8);
         SetRegister(Tiny::Drivers::Input::TITinyConCommands::Data, dataOffset++, axis & 0xFF);
     }

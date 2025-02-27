@@ -20,6 +20,7 @@ namespace TinyCon
     constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel I2CLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel CommandLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel HapticLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel IndicatorLogLevel = Tiny::TILogLevel::Info;
     constexpr Tiny::TILogLevel UsbLogLevel = Tiny::TILogLevel::Info;

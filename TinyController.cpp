@@ -37,13 +37,13 @@ void TinyCon::TinyController::Update(int32_t deltaTime)
         Processor.Update();
         if (bluetoothNeedsUpdate) Bluetooth.Update(deltaTime);
         if (usbNeedsUpdate) USBControl.Update();
-        UpdateSelectButton(deltaTime, Controller.GetButton(0, BluetoothStartButtonIndex));
+        UpdateSelectButton(deltaTime, Controller.GetButton(BluetoothStartButtonIndex));
         Suspended = false;
     }
     else
     {
         LogState::Info("State: Suspended", Tiny::TIEndl);
-        UpdateSelectButton(deltaTime, Controller.GetUpdatedButton(0, BluetoothStartButtonIndex));
+        UpdateSelectButton(deltaTime, Controller.GetUpdatedButton(BluetoothStartButtonIndex));
         Suspended = true;
     }
 

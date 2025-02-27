@@ -42,7 +42,7 @@ void TinyCon::SeesawController::Update()
         Present = false;
 }
 
-bool TinyCon::SeesawController::GetUpdatedButton(int8_t index)
+bool TinyCon::SeesawController::GetUpdatedButton(int8_t index) const
 {
     const auto mask = InputButtons[index];
     return Device.digitalReadBulk(mask) == 0;
@@ -61,7 +61,7 @@ void TinyCon::PinsInputController::Update()
         Buttons[buttonIndex].AddState(digitalRead(ButtonPins[buttonIndex]) == ((ButtonActiveState == ActiveState::High) ? HIGH : LOW));
 }
 
-bool TinyCon::PinsInputController::GetUpdatedButton(int8_t index)
+bool TinyCon::PinsInputController::GetUpdatedButton(int8_t index) const
 {
     return digitalRead(ButtonPins[index]) == ((ButtonActiveState == ActiveState::High) ? HIGH : LOW);
 }
@@ -128,7 +128,7 @@ void TinyCon::InputController::Reset()
     }
 }
 
-bool TinyCon::InputController::GetUpdatedButton(int8_t index)
+bool TinyCon::InputController::GetUpdatedButton(int8_t index) const
 {
     switch (Type)
     {

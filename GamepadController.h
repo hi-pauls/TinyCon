@@ -43,7 +43,7 @@ namespace TinyCon
         [[nodiscard]] bool GetButton(int8_t input, int8_t buttonIndex) const { return Inputs[input].Buttons[buttonIndex]; }
         [[nodiscard]] int16_t GetButtonCount() const { int8_t count = 0; for (auto& input : Inputs) count += input.GetButtonCount(); return count; }
         [[nodiscard]] bool GetButton(int8_t buttonIndex) const;
-        [[nodiscard]] bool GetUpdatedButton(int8_t controller, int8_t buttonIndex) { return Inputs[controller].GetUpdatedButton(buttonIndex); }
+        [[nodiscard]] bool GetUpdatedButton(int8_t buttonIndex) const;
 
         [[nodiscard]] bool GetAccelerationEnabled() const { return Mpus[0].AccelerationEnabled; }
         void SetAccelerationEnabled(bool enabled) { for (auto& mpu : Mpus) mpu.AccelerationEnabled = enabled; }

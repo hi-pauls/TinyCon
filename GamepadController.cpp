@@ -175,6 +175,15 @@ bool TinyCon::GamepadController::GetButton(int8_t buttonIndex) const
         else buttonIndex -= input.GetButtonCount();
     return false;
 }
+
+bool TinyCon::GamepadController::GetUpdatedButton(int8_t buttonIndex) const
+{
+    for (auto& input : Inputs)
+        if (buttonIndex < input.GetButtonCount()) return input.GetUpdatedButton(buttonIndex);
+        else buttonIndex -= input.GetButtonCount();
+    return false;
+}
+
 void TinyCon::GamepadController::Reset()
 {
     Id = 0;

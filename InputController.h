@@ -32,11 +32,12 @@ namespace TinyCon
         bool Present = false;
 
         // Special call to just update a single special button
-        bool GetUpdatedButton(int8_t index);
+        [[nodiscard]] bool GetUpdatedButton(int8_t index) const;
 
         void Reset();
     private:
-        Adafruit_seesaw Device;
+        // Make this mutable, because the Adafruit seesaw library is not const-correct for read functions
+        mutable Adafruit_seesaw Device;
         int8_t Controller = -1;
         uint8_t EncoderPosition = 0;
 
@@ -72,7 +73,7 @@ namespace TinyCon
         bool Present = false;
 
         // Special call to just update a single special button
-        bool GetUpdatedButton(int8_t index);
+        [[nodiscard]] bool GetUpdatedButton(int8_t index) const;
 
         [[nodiscard]] int16_t GetAxisCount() const { return AxisCount; }
         [[nodiscard]] int16_t GetButtonCount() const { return ButtonCount; }
@@ -102,7 +103,7 @@ namespace TinyCon
 
         [[nodiscard]] float GetAxis(int8_t index) const { return Axis[index]; }
         [[nodiscard]] bool GetButton(int8_t index) const { return Buttons[index]; }
-        bool GetUpdatedButton(int8_t index);
+        [[nodiscard]] bool GetUpdatedButton(int8_t index) const;
 
         bool Enabled = true;
         bool Present = false;

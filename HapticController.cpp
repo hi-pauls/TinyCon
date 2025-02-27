@@ -192,6 +192,7 @@ void TinyCon::HapticController::Update(int32_t deltaTime)
                 break;
         }
     }
+    LogHaptic::Info(Tiny::TIEndl);
 }
 
 bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
@@ -237,7 +238,14 @@ bool TinyCon::HapticController::HasNewCommand(int32_t deltaTime)
         RealtimeTimeLeft = RealtimePerCommandDuration;
     }
     while (command.Duration < deltaTime && Tail != Head);
-    return Tail != Head;
+    if (Tail == Head)
+    {
+        DRV2605.Stop();
+        LogHaptic::Info(", Finished");
+        return false;
+    }
+
+    return true;
 }
 
 void TinyCon::HapticController::RemoveHapticCommand(int8_t index)

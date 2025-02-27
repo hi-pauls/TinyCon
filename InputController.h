@@ -76,7 +76,7 @@ namespace TinyCon
 
         [[nodiscard]] int16_t GetAxisCount() const { return AxisCount; }
         [[nodiscard]] int16_t GetButtonCount() const { return ButtonCount; }
-        void Reset();
+
     private:
         std::array<int8_t, 2> AxisPins = {NC};
         int16_t AxisCount = 0;

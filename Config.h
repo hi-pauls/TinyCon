@@ -16,15 +16,15 @@ namespace TinyCon
     constexpr int MaxI2CWriteBufferFill = SERIAL_BUFFER_SIZE;
 
     // Not the prettiest way to do logging for now, but should do the job
-    constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel I2CLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel CommandLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel HapticLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel IndicatorLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel UsbLogLevel = Tiny::TILogLevel::Info;
-    constexpr Tiny::TILogLevel PowerLogLevel = Tiny::TILogLevel::Info;
+    constexpr Tiny::TILogLevel StateLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel BluetoothLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel GamepadLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel I2CLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel CommandLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel HapticLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel IndicatorLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel UsbLogLevel = Tiny::TILogLevel::Warning;
+    constexpr Tiny::TILogLevel PowerLogLevel = Tiny::TILogLevel::Warning;
 
     #ifndef TINYCON_PRODUCT
     #define TINYCON_PRODUCT "TinyCon"

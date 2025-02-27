@@ -133,18 +133,20 @@ namespace Tiny::Drivers::Input
     static constexpr uint16_t TITinyConVersion = 1;
     static constexpr uint16_t TITinyConMagic = 0x5443;
     static constexpr uint8_t TITinyConResetConfirm = 0xA5;
+    static constexpr uint8_t TITinyConHapticClearConfirm = 0x5A;
 
     enum class TITinyConCommandStatus : uint8_t
     {
         Ok = 0,
-        ErrorTimeout,
         ErrorInvalidCommand,
         ErrorIncompleteCommand,
         ErrorInvalidResetValue,
         ErrorInvalidMpuIndex,
+        ErrorInvalidHapticCommand,
         ErrorInvalidHapticDataSize,
         ErrorInvalidHapticController,
         ErrorInvalidHapticDataIndex,
+        ErrorInvalidHapticClearConfirm,
         WarningUnknownHapticController
     };
 

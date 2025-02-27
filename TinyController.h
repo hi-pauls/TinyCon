@@ -23,9 +23,9 @@ namespace TinyCon
 
     public:
         TinyController(TwoWire& slaveI2C, TwoWire& masterI2C0, SoftWire& masterI2C1)
-            : Controller(masterI2C0, masterI2C1), Power(masterI2C0), Processor(Controller),
+            : Controller(masterI2C0, masterI2C1), Power(masterI2C0), Processor(Controller, Power),
               USBControl(Controller, Processor), Bluetooth(Controller, Processor),
-              Indicators(masterI2C0, Controller, Power), I2C(slaveI2C, Controller, Power, Processor) {}
+              Indicators(masterI2C0, Controller, Power), I2C(slaveI2C, Processor) {}
 
         void Init(int8_t hatOffset = -1, const std::array<int8_t, MaxNativeAdcPinCount>& axisPins = {NC}, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins = {NC}, ActiveState activeState = ActiveState::Low);
         void Update(int32_t deltaTime);

@@ -6,6 +6,7 @@ void TinyCon::TinyController::Init(int8_t hatOffset, const std::array<int8_t, Ma
 {
     Controller.Init(hatOffset, axisPins, buttonPins, activeState);
     Power.Init();
+    Processor.Init();
 
 #if !NO_I2C_SLAVE
     I2C.Init();
@@ -33,7 +34,7 @@ void TinyCon::TinyController::Update(int32_t deltaTime)
     {
         LogState::Info("State: Updating", Tiny::TIEndl);
         Controller.Update(deltaTime);
-        if (i2cNeedsUpdate) I2C.Update();
+        Processor.Update();
         if (bluetoothNeedsUpdate) Bluetooth.Update(deltaTime);
         if (usbNeedsUpdate) USBControl.Update();
         UpdateSelectButton(deltaTime, Controller.GetButton(0, BluetoothStartButtonIndex));

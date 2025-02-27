@@ -147,17 +147,20 @@ std::size_t TinyCon::GamepadController::MakeMpuBuffer(Tiny::Collections::TIFixed
 
 void TinyCon::GamepadController::AddHapticCommand(Tiny::Collections::TIFixedSpan<uint8_t> data)
 {
-    for (int8_t bit = 0; bit < 8; ++bit)
-        if ((data[0] & (1 << bit)) != 0)
-        {
-            uint8_t controller = bit;
-            uint8_t command = data[1];
-            uint8_t count = data[2];
-            const uint8_t* sequence = data.data() + 3;
-            uint16_t timeout = (data[11] << 8) | data[12];
-            Haptics[controller].Insert(command, count, sequence, timeout);
-            LogGamepad::Info("Add Haptic Command: ", controller, ", ", command, ", ", count, ", ", timeout, Tiny::TIEndl);
-        }
+    if (data.size() > 12)
+    {
+        for (int8_t bit = 0; bit < 8; ++bit)
+            if ((data[0] & (1 << bit)) != 0)
+            {
+                uint8_t controller = bit;
+                uint8_t command = data[1];
+                uint8_t count = data[2];
+                const uint8_t* sequence = data.data() + 3;
+                uint16_t timeout = (data[11] << 8) | data[12];
+                Haptics[controller].Insert(command, count, sequence, timeout);
+                LogGamepad::Info("Add Haptic Command: ", controller, ", ", command, ", ", count, ", ", timeout, Tiny::TIEndl);
+            }
+    }
 }
 
 float TinyCon::GamepadController::GetAxis(int8_t axisIndex) const

@@ -39,7 +39,6 @@ namespace TinyCon
         // Make this mutable, because the Adafruit seesaw library is not const-correct for read functions
         mutable Adafruit_seesaw Device;
         int8_t Controller = -1;
-        uint8_t EncoderPosition = 0;
 
         static constexpr int8_t AddressByController[] = {0x49, 0x4A, 0x4B, 0x4C};
         static constexpr uint8_t InputAxis[] = {2, 3};

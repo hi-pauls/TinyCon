@@ -8,62 +8,63 @@
 
 #include <functional>
 
-#if NO_USB
-class USBController
-{
-public:
-    USBController(GamepadController&, CommandProcessor&) {}
-
-    void Init() {}
-    void Update() {}
-    void Disabled() {}
-    bool Mounted() { return false; }
-};
-#else
-#include <Adafruit_TinyUSB.h>
-
 namespace TinyCon
 {
-class USBController
-{
-public:
-    enum Reports : uint8_t
+#if NO_USB
+    class USBController
     {
-        ReportGamepad = 1,
-        ReportMpu = 2,
-        ReportCommand = 3
-    };
+    public:
+        USBController(const GamepadController&, CommandProcessor&) {}
 
-private:
-    static constexpr int16_t MpuReportSize = 21 * GamepadController::MaxMpuControllers;
-    static constexpr uint8_t HidDescriptor[] =
+        void Init() {}
+        void Update() {}
+        void Disabled() {}
+        void SetActive(bool) {}
+        constexpr bool IsActive() const { return false; }
+        constexpr bool IsConnected() const { return false; }
+    };
+#else
+#include <Adafruit_TinyUSB.h>
+    class USBController
+    {
+    public:
+        enum Reports : uint8_t
         {
-            TUD_HID_REPORT_DESC_GAMEPAD(HID_REPORT_ID(ReportGamepad)),
-            TUD_HID_REPORT_DESC_GENERIC_INOUT(MpuReportSize, HID_REPORT_ID(ReportMpu)),
-            TUD_HID_REPORT_DESC_GENERIC_INOUT(14, HID_REPORT_ID(ReportCommand))
+            ReportGamepad = 1,
+            ReportMpu = 2,
+            ReportCommand = 3
         };
 
-public:
-    USBController(const GamepadController& controller, CommandProcessor& processor) : Controller(controller), Processor(processor) {}
+    private:
+        static constexpr int16_t MpuReportSize = 21 * GamepadController::MaxMpuControllers;
+        static constexpr uint8_t HidDescriptor[] =
+            {
+                TUD_HID_REPORT_DESC_GAMEPAD(HID_REPORT_ID(ReportGamepad)),
+                TUD_HID_REPORT_DESC_GENERIC_INOUT(MpuReportSize, HID_REPORT_ID(ReportMpu)),
+                TUD_HID_REPORT_DESC_GENERIC_INOUT(14, HID_REPORT_ID(ReportCommand))
+            };
 
-    void Init();
-    void Update();
-    void SetActive(bool active) { Active = active; }
-    [[nodiscard]] bool IsActive() const { return Active; }
-    [[nodiscard]] bool IsConnected() const { return Connected; }
+    public:
+        USBController(const GamepadController& controller, CommandProcessor& processor) : Controller(controller), Processor(processor) {}
 
-private:
-    static std::function<void(uint8_t, hid_report_type_t, const uint8_t*, uint16_t)> ReportReceived;
-    static std::function<uint16_t(uint8_t, hid_report_type_t, uint8_t*, uint16_t)> ReportRequested;
-    static void UsbHidReportReceived(uint8_t reportId, hid_report_type_t report, const uint8_t* data, uint16_t length);
-    static uint16_t UsbHidReportRequested(uint8_t reportId, hid_report_type_t report, uint8_t* data, uint16_t length);
+        void Init();
+        void Update();
+        void SetActive(bool active) { Active = active; }
+        [[nodiscard]] bool IsActive() const { return Active; }
+        [[nodiscard]] bool IsConnected() const { return Connected; }
 
-    bool Active = false;
-    bool Connected = false;
-    Adafruit_USBD_HID Gamepad;
+    private:
+        static std::function<void(uint8_t, hid_report_type_t, const uint8_t*, uint16_t)> ReportReceived;
+        static std::function<uint16_t(uint8_t, hid_report_type_t, uint8_t*, uint16_t)> ReportRequested;
+        static void UsbHidReportReceived(uint8_t reportId, hid_report_type_t report, const uint8_t* data, uint16_t length);
+        static uint16_t UsbHidReportRequested(uint8_t reportId, hid_report_type_t report, uint8_t* data, uint16_t length);
 
-    const GamepadController& Controller;
-    CommandProcessor& Processor;
-};
+        bool Active = false;
+        bool Connected = false;
+        Adafruit_USBD_HID Gamepad;
+
+        const GamepadController& Controller;
+        CommandProcessor& Processor;
+    };
 #endif
 }

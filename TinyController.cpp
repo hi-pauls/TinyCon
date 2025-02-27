@@ -18,7 +18,7 @@ void TinyCon::TinyController::Init(int8_t hatOffset, const std::array<int8_t, Ma
 
 #if !NO_BLE
     Bluetooth.Init();
-    Bluetooth.SetActive(Power.PowerSource == PowerSources::Battery);
+    Bluetooth.SetActive(Power.PowerSource == PowerSources::Battery || !USBControl.IsActive());
 #endif
     Indicators.Init();
 }

@@ -1,3 +1,4 @@
+#MCU_BOARD ?= feather-nrf52832
 MCU_BOARD ?= feather-nrf52840
 #MCU_BOARD ?= feather-esp32s3
 TINYCON_VENDOR := Hel Industries

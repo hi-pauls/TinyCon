@@ -30,11 +30,19 @@
 #include <cstdint>
 
 #if !NO_I2C_SLAVE
-#include <nordic/nrfx/mdk/nrf52840.h>
-constexpr auto SlaveScl = 12;
-constexpr auto SlaveSda = 11;
-TwoWire SlaveI2C(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, SlaveSda, SlaveScl);
-extern "C" { void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) { SlaveI2C.onService(); } }
+    constexpr auto SlaveScl = 12;
+    constexpr auto SlaveSda = 11;
+
+#if defined(NRF52840_XXAA) || defined(NRF52832_XXAA)
+    #include <nordic/nrfx/mdk/nrf.h>
+    TwoWire SlaveI2C(NRF_TWIM1, NRF_TWIS1, SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn, SlaveSda, SlaveScl);
+    extern "C" { void SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQHandler(void) { SlaveI2C.onService(); } }
+#elif defined(ESP32)
+    TwoWire SlaveI2C(1);
+#else
+    // Lets just assume Arduino will sort it out
+    TwoWire SlaveI2C = Wire1;
+#endif
 #endif
 
 TwoWire& MasterI2C0 = Wire;
@@ -82,7 +90,11 @@ void setup()
     MasterI2C1.setClock(400000);
 
 #if !NO_I2C_SLAVE
+#ifdef ESP32
+    SlaveI2C.begin(0x44, SlaveSda, SlaveScl, 0);
+#else
     SlaveI2C.begin(0x44);
+#endif
 #endif
 
     Controller.Init(5);

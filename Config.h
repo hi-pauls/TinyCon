@@ -40,11 +40,32 @@ namespace TinyCon
     #endif
 
     #define USE_OLED 1
-    #define USE_LC709203 0
-    #define USE_NEOPIXEL 1
     #define USE_HAPTICTEST 0
 
+// Some example configs for feather boards
+#if defined(ADAFRUIT_FEATHER_ESP32S2)
+    #define USE_NEOPIXEL 1
+    #define USE_LC709203 1
+#elif defined(ADAFRUIT_FEATHER_ESP32S3)
+    #define USE_NEOPIXEL 1
+    #define USE_LC709203 1
+#elif defined(ADAFRUIT_FEATHER_NRF52840)
+    #define USE_NEOPIXEL 1
+    #define USE_LC709203 0
+#elif defined(ADAFRUIT_FEATHER_NRF52832)
+    #define USE_NEOPIXEL 0
+    #define USE_LC709203 0
+#else
+    #define USE_NEOPIXEL 0
+    #define USE_LC709203 0
+#endif
+
+#ifdef USE_TINYUSB
     #define NO_USB 0
+#else
+    #define NO_USB 1
+#endif
+
     #define NO_BLE 0
     #define NO_I2C_SLAVE 0
 }

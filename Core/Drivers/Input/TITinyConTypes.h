@@ -17,8 +17,9 @@ namespace Tiny::Drivers::Input
         NoOp = 0x0,
         /** Modifiable controller ID */
         ID = 0x1,
-        /** Version of the controller */
+        /** Version of the controller, writing the reset value to it will reset the device */
         Version = 0x2,
+        Reset = Version,
         /** VIN voltage, 2 bytes, half float, read-only */
         VinVoltage = 0x4,
         /** Battery charge percentage, 2 bytes, half float, read-only */
@@ -131,6 +132,7 @@ namespace Tiny::Drivers::Input
 
     static constexpr uint16_t TITinyConVersion = 1;
     static constexpr uint16_t TITinyConMagic = 0x5443;
+    static constexpr uint8_t TITinyConResetConfirm = 0xA5;
 
     enum class TITinyConCommandStatus : uint8_t
     {
@@ -138,6 +140,7 @@ namespace Tiny::Drivers::Input
         ErrorTimeout,
         ErrorInvalidCommand,
         ErrorIncompleteCommand,
+        ErrorInvalidResetValue,
         ErrorInvalidMpuIndex,
         ErrorInvalidHapticDataSize,
         ErrorInvalidHapticController,

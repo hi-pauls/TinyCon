@@ -34,6 +34,7 @@ namespace TinyCon
         // Special call to just update a single special button
         bool GetUpdatedButton(int8_t index);
 
+        void Reset();
     private:
         Adafruit_seesaw Device;
         int8_t Controller = -1;
@@ -75,6 +76,7 @@ namespace TinyCon
 
         [[nodiscard]] int16_t GetAxisCount() const { return AxisCount; }
         [[nodiscard]] int16_t GetButtonCount() const { return ButtonCount; }
+        void Reset();
     private:
         std::array<int8_t, 2> AxisPins = {NC};
         int16_t AxisCount = 0;
@@ -92,6 +94,8 @@ namespace TinyCon
         void Init(TwoWire& i2c, int8_t controller);
         void Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState);
         void Update();
+        void Reset();
+
         [[nodiscard]] Tiny::Drivers::Input::TITinyConControllerTypes GetType() const;
         [[nodiscard]] int16_t GetAxisCount() const;
         [[nodiscard]] int16_t GetButtonCount() const;

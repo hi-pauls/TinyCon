@@ -100,3 +100,18 @@ void TinyCon::MpuController::SetGyroscopeRange(Tiny::Drivers::Input::TITinyConGy
         }
     }
 }
+
+void TinyCon::MpuController::Reset()
+{
+    Present = Icm20948Present = false;
+    Acceleration = {0, 0, 0};
+    AngularVelocity = {0, 0, 0};
+    Orientation = {0, 0, 0};
+    Temperature = 0;
+    AccelerationEnabled = true;
+    AngularVelocityEnabled = true;
+    OrientationEnabled = true;
+    TemperatureEnabled = true;
+    AccelerationRange = Tiny::Drivers::Input::TITinyConAccelerometerRanges::G16;
+    GyroscopeRange = Tiny::Drivers::Input::TITinyConGyroscopeRanges::D2000;
+}

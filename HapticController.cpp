@@ -247,3 +247,8 @@ void TinyCon::HapticController::RemoveHapticCommand(int8_t index)
     Commands[index].Count = 0;
     Commands[index].Duration = 0;
 }
+void TinyCon::HapticController::Reset()
+{
+    Head = Tail = 0;
+    if (DRV2605.Present) DRV2605.Stop();
+}

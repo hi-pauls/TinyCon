@@ -47,6 +47,11 @@ bool TinyCon::SeesawController::GetUpdatedButton(int8_t index)
     const auto mask = InputButtons[index];
     return Device.digitalReadBulk(mask) == 0;
 }
+void TinyCon::SeesawController::Reset()
+{
+    Present = false;
+    Device.SWReset();
+}
 
 void TinyCon::PinsInputController::Update()
 {
@@ -70,7 +75,6 @@ void TinyCon::PinsInputController::Init(const std::array<int8_t, MaxNativeAdcPin
     memcpy(AxisPins.data(), axisPins.data(), AxisPins.size() * sizeof(int8_t));
     memcpy(ButtonPins.data(), buttonPins.data(), ButtonPins.size() * sizeof(int8_t));
 }
-
 
 void TinyCon::InputController::Init(const std::array<int8_t, MaxNativeAdcPinCount>& axisPins, const std::array<int8_t, MaxNativeGpioPinCount>& buttonPins, ActiveState activeState)
 {
@@ -110,6 +114,16 @@ void TinyCon::InputController::Update()
             for (float axis : Seesaw.Axis) Axis[axisIndex++] = axis;
             for (auto & button : Seesaw.Buttons) Buttons[buttonIndex++] = button.Get();
             break;
+        default: break;
+    }
+}
+
+void TinyCon::InputController::Reset()
+{
+    Enabled = true;
+    switch (Type)
+    {
+        case Tiny::Drivers::Input::TITinyConControllerTypes::Seesaw: if (Seesaw.Present) Seesaw.Reset(); break;
         default: break;
     }
 }

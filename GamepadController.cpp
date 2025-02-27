@@ -175,3 +175,10 @@ bool TinyCon::GamepadController::GetButton(int8_t buttonIndex) const
         else buttonIndex -= input.GetButtonCount();
     return false;
 }
+void TinyCon::GamepadController::Reset()
+{
+    Id = 0;
+    for (auto& haptic : Haptics) haptic.Reset();
+    for (auto& mpu : Mpus) mpu.Reset();
+    for (auto& input : Inputs) input.Reset();
+}

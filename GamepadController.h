@@ -81,6 +81,8 @@ namespace TinyCon
 
         uint8_t Id = 0;
 
+        void Reset();
+
     private:
         TwoWire& I2C0;
         SoftWire& I2C1;

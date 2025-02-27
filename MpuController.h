@@ -36,6 +36,7 @@ namespace TinyCon
         Tiny::Math::TIVector3F Orientation = {};
         float Temperature = 0;
 
+        void Reset();
     private:
         static constexpr int8_t ICM20948AddressByController[] = {0x68, 0x69};
         static constexpr int8_t ICM20948AddressByControllerSize = sizeof(ICM20948AddressByController) / sizeof(ICM20948AddressByController[0]);

@@ -57,6 +57,7 @@ namespace TinyCon
         bool Enabled = true;
         bool Present = false;
 
+        void Reset();
     private:
         DRV2605Controller DRV2605;
 

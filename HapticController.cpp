@@ -182,7 +182,7 @@ void TinyCon::HapticController::Update(int32_t deltaTime)
         switch (command.Command)
         {
             case Tiny::Drivers::Input::TITinyConHapticCommands::PlayWaveform:
-                DRV2605.PlayWaveform(&command.Value[0]);
+                DRV2605.PlayWaveform(command.Value);
                 break;
             case Tiny::Drivers::Input::TITinyConHapticCommands::PlayRealtime:
                 DRV2605.PlayRealtime(command.Value[RealtimeIndex]);

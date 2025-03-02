@@ -78,13 +78,17 @@ The code is structured in the following way:
 - `GamepadController.h/.cpp` deals with all building blocks for the gamepad(s), allowing for up to 8 pads,
   but at the moment only using 2. It is further divided into `InputController.h/.cpp` to abstract possible
   sticks and buttons, `MPUController.h/.cpp` to abstract the IMU and `HapticController.h/.cpp` to abstract
-  the haptic feedback controllers.
+  the haptic feedback controllers. These are using switches and unions instead of virtual functions to allow 
+  the controller to own its driver and to avoid having to dependency-inject each driver separately for the
+  limited scope of the project. To scale to other drivers, actual abstraction would be recommended.
 - `Bluetooth.h/.cpp` deals with the Bluetooth state changes, including the advertising and connection handling.
 - `USB.h/.cpp` deals with the USB state changes, including the USB HID gamepad handling, exposing haptics and MPU.
 - `I2C.h/.cpp` deals with I2C access, providing command handling and a register file implementation.
 - `CommandProcessor.h/.cpp` deals with handling commands that result from I2C, USB or Bluetooth communication,
   modifying available features and inserting haptic commands.
 - `Indicators.h/.cpp` deals with the LED and OLED display, providing feedback on the current state of the controller.
+- `Core/Drivers/Input/TITinyConTypes.h` contains the reusable definitions, that can be copied to another project to
+  implement a driver for your project against.
 
 Connections between the blocks are dependency-injected. All blocks are created on the stack to avoid problems
 with dynamic allocation, and modern C++ features are used in some cases. Templates and excessive driver
